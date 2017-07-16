@@ -116,7 +116,7 @@ namespace Etc
 		}
 
 		float CalcPixelError(ColorFloatRGBA a_frgbaDecodedColor, float a_fDecodedAlpha,
-								ColorFloatRGBA a_frgbaSourcePixel);
+								ColorFloatRGBA a_frgbaSourcePixel) const;
 
 	protected:
 

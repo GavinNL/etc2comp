@@ -117,7 +117,7 @@ namespace Etc
 	// the error amount is base on the error metric
 	//
 	float Block4x4Encoding::CalcPixelError(ColorFloatRGBA a_frgbaDecodedColor, float a_fDecodedAlpha,
-											ColorFloatRGBA a_frgbaSourcePixel)
+											ColorFloatRGBA a_frgbaSourcePixel) const
 	{
 
 		// if a border pixel
