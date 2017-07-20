@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include <chrono>
 
 //#include "Etc.h"
@@ -36,7 +38,7 @@ namespace Etc
     public:
 
 		//the differnt warning and errors that can come up during encoding
-		enum  EncodingStatus
+		enum EncodingStatus : std::uint32_t
 		{
 			SUCCESS = 0,
 			//
@@ -243,5 +245,10 @@ public:
 		EncodingStatus m_warningsToCapture;
 		friend class Executor;
 	};
+
+	constexpr bool IsError(Image::EncodingStatus const status)
+	{
+		return ((status & Image::ERROR_THRESHOLD) - 1) >= (Image::ERROR_THRESHOLD - 1);
+	}
 
 } // namespace Etc
