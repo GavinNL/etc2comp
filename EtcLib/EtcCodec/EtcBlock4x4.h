@@ -72,17 +72,17 @@ namespace Etc
 			m_pencoding->SetEncodingBits();
 		}
 
-		inline unsigned int GetSourceH(void)
+		inline unsigned int GetSourceH(void) const
 		{
 			return m_uiSourceH;
 		}
 
-		inline unsigned int GetSourceV(void)
+		inline unsigned int GetSourceV(void) const
 		{
 			return m_uiSourceV;
 		}
 
-		inline float GetError(void)
+		inline float GetError(void) const
 		{
 			return m_pencoding->GetError();
 		}
@@ -104,12 +104,12 @@ namespace Etc
 			return m_pencoding->GetMode();
 		}
 
-		inline bool GetFlip(void)
+		inline bool GetFlip(void) const
 		{
 			return m_pencoding->GetFlip();
 		}
 
-		inline bool IsDifferential(void)
+		inline bool IsDifferential(void) const
 		{
 			return m_pencoding->IsDifferential();
 		}
@@ -119,7 +119,7 @@ namespace Etc
 			return m_afrgbaSource;
 		}
 
-		inline ErrorMetric GetErrorMetric()
+		inline ErrorMetric GetErrorMetric() const
 		{
 			return m_errormetric;
 		}
@@ -131,7 +131,7 @@ namespace Etc
 			return m_pencoding;
 		}
 
-		inline SourceAlphaMix GetSourceAlphaMix(void)
+		inline SourceAlphaMix GetSourceAlphaMix(void) const
 		{
 			return m_sourcealphamix;
 		}
@@ -141,12 +141,12 @@ namespace Etc
 			return m_pimageSource;
 		}
 
-		inline bool HasBorderPixels(void)
+		inline bool HasBorderPixels(void) const
 		{
 			return m_boolBorderPixels;
 		}
 
-		inline bool HasPunchThroughPixels(void)
+		inline bool HasPunchThroughPixels(void) const
 		{
 			return m_boolPunchThroughPixels;
 		}
