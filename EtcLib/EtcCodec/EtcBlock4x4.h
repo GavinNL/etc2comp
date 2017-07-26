@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include "EtcColor.h"
 #include "EtcColorFloatRGBA.h"
 #include "EtcErrorMetric.h"
@@ -35,7 +37,7 @@ namespace Etc
 		static const unsigned int PIXELS = ROWS * COLUMNS;
 
 		// the alpha mix for a 4x4 block of pixels
-		enum class SourceAlphaMix
+		enum class SourceAlphaMix : std::uint8_t
 		{
 			UNKNOWN,
 			//
