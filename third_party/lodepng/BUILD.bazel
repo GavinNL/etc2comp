@@ -1,0 +1,16 @@
+
+licenses(["permissive"])
+
+cc_library(
+    name = "lodepng",
+    hdrs = [
+        "lodepng.h",
+    ],
+    srcs = [
+        "lodepng.cpp",
+    ],
+    includes = [
+        ".",
+    ],
+    visibility = ["//visibility:public"],
+)
