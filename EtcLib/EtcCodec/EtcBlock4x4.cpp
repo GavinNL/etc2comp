@@ -85,7 +85,7 @@ namespace Etc
 									ErrorMetric a_errormetric)
 	{
 
-		Block4x4();
+		*this = Block4x4();
 
 		m_pimageSource = a_pimageSource;
 		m_uiSourceH = a_uiSourceH;
@@ -196,7 +196,7 @@ namespace Etc
 											Image *a_pimageSource,
 											ErrorMetric a_errormetric)
 	{
-		Block4x4();
+		*this = Block4x4();
 
 		m_pimageSource = a_pimageSource;
 		m_uiSourceH = a_uiSourceH;
