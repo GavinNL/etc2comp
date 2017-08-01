@@ -685,7 +685,7 @@ namespace Etc
 		ColorFloatRGBA	afrgbaBestDecodedPixels[PIXELS];
 		ColorFloatRGBA afrgbaDecodedPixel[SELECTORS];
 		
-		assert(SELECTORS == 4);
+		static_assert(SELECTORS == 4, "");
 		afrgbaDecodedPixel[0] = m_frgbaColor1;
 		afrgbaDecodedPixel[1] = (m_frgbaColor2 + fDistance).ClampRGB();
 		afrgbaDecodedPixel[2] = m_frgbaColor2;
@@ -926,7 +926,7 @@ namespace Etc
 		ColorFloatRGBA	afrgbaBestDecodedPixels[PIXELS];
 		ColorFloatRGBA afrgbaDecodedPixel[SELECTORS];
 		
-		assert(SELECTORS == 4);
+		static_assert(SELECTORS == 4, "");
 		afrgbaDecodedPixel[0] = (m_frgbaColor1 + fDistance).ClampRGB();
 		afrgbaDecodedPixel[1] = (m_frgbaColor1 - fDistance).ClampRGB();
 		afrgbaDecodedPixel[2] = (m_frgbaColor2 + fDistance).ClampRGB();

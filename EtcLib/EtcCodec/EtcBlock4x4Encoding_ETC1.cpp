@@ -733,7 +733,7 @@ namespace Etc
 
 						// pre-compute decoded pixels for each selector
 						ColorFloatRGBA afrgbaSelectors[SELECTORS];
-						assert(SELECTORS == 4);
+						static_assert(SELECTORS == 4, "");
 						afrgbaSelectors[0] = (frgbaColor + s_aafCwTable[uiCW][0]).ClampRGB();
 						afrgbaSelectors[1] = (frgbaColor + s_aafCwTable[uiCW][1]).ClampRGB();
 						afrgbaSelectors[2] = (frgbaColor + s_aafCwTable[uiCW][2]).ClampRGB();
@@ -926,7 +926,7 @@ namespace Etc
 
 						// pre-compute decoded pixels for each selector
 						ColorFloatRGBA afrgbaSelectors[SELECTORS];
-						assert(SELECTORS == 4);
+						static_assert(SELECTORS == 4, "");
 						afrgbaSelectors[0] = (frgbaColor + s_aafCwTable[uiCW][0]).ClampRGB();
 						afrgbaSelectors[1] = (frgbaColor + s_aafCwTable[uiCW][1]).ClampRGB();
 						afrgbaSelectors[2] = (frgbaColor + s_aafCwTable[uiCW][2]).ClampRGB();

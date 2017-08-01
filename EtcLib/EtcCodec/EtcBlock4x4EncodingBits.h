@@ -80,7 +80,7 @@ namespace Etc
 
 		inline Block4x4EncodingBits_RGB8(void)
 		{
-			assert(sizeof(Block4x4EncodingBits_RGB8) == BYTES_PER_BLOCK);
+			static_assert(sizeof(Block4x4EncodingBits_RGB8) == BYTES_PER_BLOCK, "");
 
 			for (unsigned int uiByte = 0; uiByte < BYTES_PER_BLOCK; uiByte++)
 			{
