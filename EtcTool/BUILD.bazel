@@ -1,0 +1,24 @@
+
+cc_binary(
+    name = "EtcTool",
+    srcs = [
+        "EtcAnalysis.h",
+        "EtcComparison.cpp",
+        "EtcComparison.h",
+        "EtcFile.cpp",
+        "EtcFile.h",
+        "EtcFileHeader.cpp",
+        "EtcFileHeader.h",
+        "EtcMemTest.h",
+        "EtcSourceImage.cpp",
+        "EtcSourceImage.h",
+        "EtcTool.h",
+        "EtcAnalysis.cpp",
+        "EtcMemTest.cpp",
+        "EtcTool.cpp",
+    ],
+    deps = [
+        "//third_party/lodepng",
+        "//EtcLib",
+    ],
+)
