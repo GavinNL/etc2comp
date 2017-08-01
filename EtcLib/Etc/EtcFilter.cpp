@@ -226,7 +226,7 @@ int FilterTwoPass( RGBCOLOR *pSrcImage, int srcWidth, int srcHeight,
     //** Need to create a temporary image to stuff the horizontally scaled image
     //**------------------------------------------------------------------------
     pTempImage = (RGBCOLOR *)malloc( destWidth * srcHeight * sizeof(RGBCOLOR) );
-    if ( pTempImage == NULL )
+    if ( pTempImage == nullptr )
     {
         return 0;
     }

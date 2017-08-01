@@ -618,9 +618,9 @@ namespace Etc
 				fprintf(a_pfile, "selectors(red: %s)\n", redSelectors);
 				fprintf(a_pfile, "selectors(grn: %s)\n,", grnSelectors);
 				delete[] redSelectors;
-				redSelectors = NULL;
+				redSelectors = nullptr;
 				delete[] grnSelectors;
-				grnSelectors = NULL;
+				grnSelectors = nullptr;
 			}
 			else
 			{

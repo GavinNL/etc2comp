@@ -190,8 +190,8 @@ namespace Etc
         {
             Bucket *pbucket = &m_pabucket[iBucket];
 
-            pbucket->plinkFirst = 0;
-            pbucket->plinkLast = 0;
+            pbucket->plinkFirst = nullptr;
+            pbucket->plinkLast = nullptr;
         }
     }
 

@@ -157,7 +157,7 @@ int FilterTwoPass(T *pSrcImage, int srcWidth, int srcHeight,
 	//** Need to create a temporary image to stuff the horizontally scaled image
 	//**------------------------------------------------------------------------
 	pTempImage = new T[destWidth * srcHeight * numComponents];
-	if (pTempImage == NULL)
+	if (pTempImage == nullptr)
 	{
 		return 0;
 	}
