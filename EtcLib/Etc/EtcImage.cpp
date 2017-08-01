@@ -23,7 +23,7 @@ Image is an array of 4x4 blocks that represent the encoding of the source image
 
 #include "EtcConfig.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "EtcImage.h"
 
@@ -38,9 +38,9 @@ Image is an array of 4x4 blocks that represent the encoding of the source image
 #include <ctime>
 #include <chrono>
 #include <future>
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
+#include <cstdio>
+#include <cstring>
+#include <cassert>
 
 // fix conflict with Block4x4::AlphaMix
 #ifdef OPAQUE

@@ -29,9 +29,9 @@ The sorting is done with buckets, where each bucket is an indication of how much
 
 #include "EtcBlock4x4.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
+#include <cstdio>
+#include <cstring>
+#include <cassert>
 
 namespace Etc
 {

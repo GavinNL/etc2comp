@@ -34,10 +34,10 @@ Block4x4Encoding_RGBA8 is used when there is a mixture of alphas in the 4x4 bloc
 #include "EtcBlock4x4EncodingBits.h"
 #include "EtcBlock4x4.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
-#include <float.h>
+#include <cstdio>
+#include <cstring>
+#include <cassert>
+#include <cfloat>
 #include <limits>
 
 namespace Etc
@@ -206,7 +206,7 @@ namespace Etc
 			float fAlpha = m_pafrgbaSource[uiPixel].fA;
 
 			// ignore border pixels
-			if (isnan(fAlpha))
+			if (std::isnan(fAlpha))
 			{
 				continue;
 			}
@@ -292,7 +292,7 @@ namespace Etc
 							float fDecodedAlpha = DecodePixelAlpha(fBase, fMultiplier, uiTableEntry, uiSelector);
 
 							// border pixels (NAN) should have zero error
-							float fPixelDeltaAlpha = isnan(m_pafrgbaSource[uiPixel].fA) ?
+							float fPixelDeltaAlpha = std::isnan(m_pafrgbaSource[uiPixel].fA) ?
 															0.0f :
 															fDecodedAlpha - m_pafrgbaSource[uiPixel].fA;
 

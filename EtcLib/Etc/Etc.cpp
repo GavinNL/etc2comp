@@ -18,7 +18,7 @@
 #include "Etc.h"
 #include "EtcFilter.h"
 
-#include <string.h>
+#include <cstring>
 
 namespace Etc
 {

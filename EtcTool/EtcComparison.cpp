@@ -36,9 +36,9 @@
 
 #include "lodepng.h"
 
-#include <stdlib.h>
-#include <string.h>
-#include <float.h>
+#include <cstdlib>
+#include <cstring>
+#include <cfloat>
 #include <limits>
 
 namespace Etc

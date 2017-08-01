@@ -27,10 +27,10 @@ Block4x4Encoding_RG11 is the encoder to use when targetting file format RG11 and
 #include "EtcBlock4x4EncodingBits.h"
 #include "EtcBlock4x4.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
-#include <float.h>
+#include <cstdio>
+#include <cstring>
+#include <cassert>
+#include <cfloat>
 #include <limits>
 
 namespace Etc
@@ -238,7 +238,7 @@ namespace Etc
 		{
 			// ignore border pixels
 			float fAlpha = m_pafrgbaSource[uiPixel].fA;
-			if (isnan(fAlpha))
+			if (std::isnan(fAlpha))
 			{
 				continue;
 			}

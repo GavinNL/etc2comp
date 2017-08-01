@@ -24,7 +24,7 @@ Gathers the results of the various encoding trys for both halves of a 4x4 block 
 #include "EtcConfig.h"
 #include "EtcDifferentialTrys.h"
 
-#include <assert.h>
+#include <cassert>
 
 namespace Etc
 {

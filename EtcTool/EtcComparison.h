@@ -17,7 +17,7 @@
 #pragma once
 
 #include "EtcColor.h"
-#include <stdio.h>
+#include <cstdio>
 
 namespace Etc
 {

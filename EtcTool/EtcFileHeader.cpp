@@ -18,7 +18,7 @@
 
 #include "EtcBlock4x4EncodingBits.h"
 
-#include <assert.h>
+#include <cassert>
 
 namespace Etc
 {

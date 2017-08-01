@@ -29,7 +29,7 @@
 #include "EtcBlock4x4.h"
 
 #include "lodepng.h"
-#include <stdlib.h>
+#include <cstdlib>
 #include <cmath> //sqrt fn()
 
 namespace Etc

@@ -28,9 +28,9 @@ particular file format (e.g. ETC1, RGB8, RGBA8, R11)
 #include "EtcBlock4x4EncodingBits.h"
 #include "EtcBlock4x4.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
+#include <cstdio>
+#include <cstring>
+#include <cassert>
 
 namespace Etc
 {
@@ -121,7 +121,7 @@ namespace Etc
 	{
 
 		// if a border pixel
-		if (isnan(a_frgbaSourcePixel.fA))
+		if (std::isnan(a_frgbaSourcePixel.fA))
 		{
 			return 0.0f;
 		}

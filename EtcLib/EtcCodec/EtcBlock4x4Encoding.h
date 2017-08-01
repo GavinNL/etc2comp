@@ -20,8 +20,8 @@
 
 #include "EtcErrorMetric.h"
 
-#include <assert.h>
-#include <float.h>
+#include <cassert>
+#include <cfloat>
 
 namespace Etc
 {

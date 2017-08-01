@@ -28,10 +28,10 @@
 #include "Etc.h"
 #include "EtcBlock4x4EncodingBits.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstring>
+#include <cassert>
+#include <cstdlib>
 
 using namespace Etc;
 

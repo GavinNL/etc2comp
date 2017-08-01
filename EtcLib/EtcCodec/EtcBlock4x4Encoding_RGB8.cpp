@@ -31,10 +31,10 @@ Block4x4Encoding_ETC1 encodes the ETC1 subset of RGB8.
 #include "EtcBlock4x4.h"
 #include "EtcMath.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
-#include <float.h>
+#include <cstdio>
+#include <cstring>
+#include <cassert>
+#include <cfloat>
 #include <limits>
 
 namespace Etc

@@ -36,7 +36,7 @@
 
 
 // short names for common types
-#include <stdint.h>
+#include <cstdint>
 typedef int8_t i8;
 typedef int16_t i16;
 typedef int32_t i32;
@@ -63,5 +63,5 @@ typedef double	f64;
 #include <tchar.h>
 #endif
 
-#include <stdio.h>
+#include <cstdio>
 

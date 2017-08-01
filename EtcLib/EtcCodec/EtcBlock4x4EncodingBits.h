@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <assert.h>
+#include <cassert>
 
 namespace Etc
 {

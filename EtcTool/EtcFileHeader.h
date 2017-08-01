@@ -17,8 +17,8 @@
 #pragma once
 
 #include "EtcFile.h"
-#include <stdio.h>
-#include <inttypes.h>
+#include <cstdio>
+#include <cinttypes>
 
 namespace Etc
 {

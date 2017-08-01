@@ -29,10 +29,10 @@ used for the ETC1 subset of file format RGB8, RGBA8 and RGB8A1
 #include "EtcBlock4x4EncodingBits.h"
 #include "EtcDifferentialTrys.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
-#include <float.h>
+#include <cstdio>
+#include <cstring>
+#include <cassert>
+#include <cfloat>
 #include <limits>
 
 namespace Etc
@@ -416,7 +416,7 @@ namespace Etc
 			// treat alpha NAN as 0.0f
 			for (unsigned int uiPixel = 0; uiPixel < PIXELS; uiPixel++)
 			{
-				afSourceAlpha[uiPixel] = isnan(m_pafrgbaSource[uiPixel].fA) ? 
+				afSourceAlpha[uiPixel] = std::isnan(m_pafrgbaSource[uiPixel].fA) ? 
 																		0.0f : 
 																		m_pafrgbaSource[uiPixel].fA;
 			}

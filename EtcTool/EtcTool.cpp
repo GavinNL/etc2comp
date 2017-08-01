@@ -42,9 +42,9 @@ that can be created.
 
 #include "EtcAnalysis.h"
 
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
 
 using namespace Etc;
 

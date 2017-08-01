@@ -35,9 +35,9 @@ Block4x4Encoding_RGB8A1 is used when there is a mixture of alphas in the 4x4 blo
 #include "EtcBlock4x4EncodingBits.h"
 #include "EtcBlock4x4Encoding_RGB8.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
+#include <cstdio>
+#include <cstring>
+#include <cassert>
 
 namespace Etc
 {

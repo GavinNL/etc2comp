@@ -28,9 +28,9 @@
 #include "EtcBlock4x4EncodingBits.h"
 #include "EtcFileHeader.h"
 
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
 
 #define MAX_JOBS 1024
 using namespace Etc;

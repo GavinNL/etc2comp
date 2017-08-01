@@ -19,7 +19,7 @@
 #include "EtcConfig.h"
 #include "EtcColor.h"
 
-#include <math.h>
+#include <cmath>
 
 namespace Etc
 {
