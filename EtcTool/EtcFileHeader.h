@@ -45,7 +45,7 @@ namespace Etc
 
 		FileHeader_Pkm(File *a_pfile);
 
-		virtual void Write(FILE *a_pfile);
+		virtual void Write(FILE *a_pfile) override;
 		virtual ~FileHeader_Pkm(void) {}
 	private:
 
@@ -127,7 +127,7 @@ namespace Etc
 
 		FileHeader_Ktx(File *a_pfile);
 
-		virtual void Write(FILE *a_pfile);
+		virtual void Write(FILE *a_pfile) override;
 		virtual ~FileHeader_Ktx(void) {}
 
 		void AddKeyAndValue(KeyValuePair *a_pkeyvaluepair);
