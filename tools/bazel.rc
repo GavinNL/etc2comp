@@ -2,3 +2,5 @@ build --cxxopt=-std=c++17
 build --host_cxxopt=-std=c++17
 build --cxxopt=-Werror=suggest-override
 build --host_cxxopt=-Werror=suggest-override
+build --cxxopt=-Werror=format
+build --host_cxxopt=-Werror=format
