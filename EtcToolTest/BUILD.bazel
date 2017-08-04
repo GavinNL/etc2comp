@@ -1,8 +1,10 @@
 
-py_test(
+load("@io_bazel_rules_go//go:def.bzl", "go_test")
+
+go_test(
     name = "EtcToolTest",
     srcs = [
-        "EtcToolTest.py",
+        "EtcToolTest.go",
     ],
     args = [
         "$(location //EtcTool)",

@@ -1,5 +1,14 @@
 workspace(name = "com_github_abergmeier_etc2comp")
 
+git_repository(
+    name = "io_bazel_rules_go",
+    remote = "https://github.com/bazelbuild/rules_go.git",
+    tag = "0.5.2",
+)
+load("@io_bazel_rules_go//go:def.bzl", "go_repositories")
+
+go_repositories()
+
 new_http_archive(
     name = "com_github_openimageio_oiio_images",
     url = "https://github.com/OpenImageIO/oiio-images/archive/9a70c65c7a29a50114a8208d61c87ba4fedd018e.zip",
