@@ -393,7 +393,7 @@ namespace Etc
 				break;
 			}
 
-			plink->GetBlock()->PerformEncodingIteration(m_fEffort);
+			plink->GetBlock()->PerformEncodingIteration(m_format, m_errormetric, m_fEffort);
 
 			uiIteratedBlocks += a_uiMultithreadingStride;	
 		}
@@ -595,7 +595,7 @@ namespace Etc
 				uiBlock += a_uiMultithreadingStride)
 		{
 			Block4x4 *pblock = &m_pablock[uiBlock];
-			pblock->PerformEncodingIteration(m_fEffort);
+			pblock->PerformEncodingIteration(m_format, m_errormetric, m_fEffort);
 		}
 	}
 
@@ -612,7 +612,7 @@ namespace Etc
 				uiBlock += a_uiMultithreadingStride)
 		{
 			Block4x4 *pblock = &m_pablock[uiBlock];
-			pblock->SetEncodingBitsFromEncoding();
+			pblock->SetEncodingBitsFromEncoding(m_format);
 		}
 
 	}

@@ -35,16 +35,19 @@ namespace Etc
 
 		virtual void InitFromSource(Block4x4 *a_pblockParent,
 			ColorFloatRGBA *a_pafrgbaSource,
-			unsigned char *a_paucEncodingBits, ErrorMetric a_errormetric) override;
+			Image::Format a_encoding,
+			unsigned char *a_paucEncodingBits,
+			ErrorMetric a_errormetric) override;
 
 		virtual void InitFromEncodingBits(Block4x4 *a_pblockParent,
+			Image::Format a_encoding,
 			unsigned char *a_paucEncodingBits,
 			ColorFloatRGBA *a_pafrgbaSource,
 			ErrorMetric a_errormetric) override;
 
-		virtual void PerformIteration(float a_fEffort) override;
+		virtual void PerformIteration(Image::Format a_encoding, ErrorMetric a_errormetric, float a_fEffort) override;
 
-		virtual void SetEncodingBits(void) override;
+		virtual void SetEncodingBits(Image::Format a_encoding) override;
 
 		inline float GetRedBase(void) const
 		{
@@ -74,7 +77,7 @@ namespace Etc
 
 		static float s_aafModifierTable[MODIFIER_TABLE_ENTRYS][SELECTORS];
 
-		void CalculateR11(unsigned int a_uiSelectorsUsed, 
+		void CalculateR11(Image::Format a_format, unsigned int a_uiSelectorsUsed, 
 							float a_fBaseRadius, float a_fMultiplierRadius);
 
 		

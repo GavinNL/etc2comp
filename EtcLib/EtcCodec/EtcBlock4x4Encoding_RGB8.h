@@ -29,14 +29,14 @@ namespace Etc
 		virtual ~Block4x4Encoding_RGB8(void);
 
 		virtual void InitFromEncodingBits(Block4x4 *a_pblockParent,
+											Image::Format a_encoding,
 											unsigned char *a_paucEncodingBits,
 											ColorFloatRGBA *a_pafrgbaSource,
-
 											ErrorMetric a_errormetric) override;
 
-		virtual void PerformIteration(float a_fEffort) override;
+		virtual void PerformIteration(Image::Format a_encoding, ErrorMetric a_errormetric, float a_fEffort) override;
 		
-		virtual void SetEncodingBits(void) override;
+		virtual void SetEncodingBits(Image::Format a_encoding) override;
 
 		inline ColorFloatRGBA GetColor3(void) const
 		{
@@ -52,7 +52,7 @@ namespace Etc
 		static float s_afTHDistanceTable[TH_DISTANCES];
 
 		void TryPlanar(unsigned int a_uiRadius);
-		void TryTAndH(unsigned int a_uiRadius);
+		void TryTAndH(ErrorMetric a_errormetric, unsigned int a_uiRadius);
 
 		void InitFromEncodingBits_Planar(void);
 
@@ -66,7 +66,7 @@ namespace Etc
 		ColorFloatRGBA	m_frgbaOriginalColor1_TAndH;
 		ColorFloatRGBA	m_frgbaOriginalColor2_TAndH;
 
-		void CalculateBaseColorsForTAndH(void);
+		void CalculateBaseColorsForTAndH(ErrorMetric a_errormetric);
 		void TryT(unsigned int a_uiRadius);
 		void TryT_BestSelectorCombination(void);
 		void TryH(unsigned int a_uiRadius);

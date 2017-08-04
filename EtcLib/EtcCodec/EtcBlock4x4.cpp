@@ -51,7 +51,6 @@ namespace Etc
 	//
 	Block4x4::Block4x4(void)
 	{
-		m_pimageSource = nullptr;
 		m_uiSourceH = 0;
 		m_uiSourceV = 0;
 
@@ -66,7 +65,6 @@ namespace Etc
 	}
 	Block4x4::~Block4x4()
 	{
-		m_pimageSource = nullptr;
 		if (m_pencoding)
 		{
 			delete m_pencoding;
@@ -87,15 +85,14 @@ namespace Etc
 
 		*this = Block4x4();
 
-		m_pimageSource = a_pimageSource;
 		m_uiSourceH = a_uiSourceH;
 		m_uiSourceV = a_uiSourceV;
 		m_errormetric = a_errormetric;
 
-		SetSourcePixels();
+		SetSourcePixels(a_pimageSource);
 
 		// set block encoder function
-		switch (m_pimageSource->GetFormat())
+		switch (a_pimageSource->GetFormat())
 		{
 		case Image::Format::ETC1:
 			m_pencoding = new Block4x4Encoding_ETC1;
@@ -179,7 +176,9 @@ namespace Etc
 		}
 
 		m_pencoding->InitFromSource(this, m_afrgbaSource,
-									a_paucEncodingBits, a_errormetric);
+									a_pimageSource->GetFormat(),
+									a_paucEncodingBits,
+									a_errormetric);
 
 	}
 
@@ -198,12 +197,11 @@ namespace Etc
 	{
 		*this = Block4x4();
 
-		m_pimageSource = a_pimageSource;
 		m_uiSourceH = a_uiSourceH;
 		m_uiSourceV = a_uiSourceV;
 		m_errormetric = a_errormetric;
 
-		SetSourcePixels();
+		SetSourcePixels(a_pimageSource);
 
 		// set block encoder function
 		switch (a_imageformat)
@@ -240,8 +238,9 @@ namespace Etc
 			break;
 		}
 
-		m_pencoding->InitFromEncodingBits(this, a_paucEncodingBits, m_afrgbaSource,
-										m_pimageSource->GetErrorMetric());
+		m_pencoding->InitFromEncodingBits(this, a_imageformat, a_paucEncodingBits,
+										m_afrgbaSource,
+										a_errormetric);
 
 	}
 	
@@ -249,10 +248,10 @@ namespace Etc
 	// set source pixels from m_pimageSource
 	// set m_alphamix
 	//
-	void Block4x4::SetSourcePixels(void)
+	void Block4x4::SetSourcePixels(Image *a_imageSource)
 	{
 
-		Image::Format imageformat = m_pimageSource->GetFormat();
+		Image::Format imageformat = a_imageSource->GetFormat();
 
 		// alpha census
 		unsigned int uiTransparentSourcePixels = 0;
@@ -269,7 +268,7 @@ namespace Etc
 			{
 				unsigned int uiSourcePixelV = m_uiSourceV + uiBlockPixelV;
 
-				ColorFloatRGBA *pfrgbaSource = m_pimageSource->GetSourcePixel(uiSourcePixelH, uiSourcePixelV);
+				ColorFloatRGBA *pfrgbaSource = a_imageSource->GetSourcePixel(uiSourcePixelH, uiSourcePixelV);
 
 				// if pixel extends beyond source image because of block padding
 				if (pfrgbaSource == nullptr)
@@ -287,45 +286,45 @@ namespace Etc
 
 					if (m_afrgbaSource[uiPixel].fA == 1.0f || m_errormetric == RGBX)
 					{
-						m_pimageSource->m_iNumOpaquePixels++;
+						a_imageSource->m_iNumOpaquePixels++;
 					}
 					else if (m_afrgbaSource[uiPixel].fA == 0.0f)
 					{
-						m_pimageSource->m_iNumTransparentPixels++;
+						a_imageSource->m_iNumTransparentPixels++;
 					}
 					else if(m_afrgbaSource[uiPixel].fA > 0.0f && m_afrgbaSource[uiPixel].fA < 1.0f)
 					{
-						m_pimageSource->m_iNumTranslucentPixels++;
+						a_imageSource->m_iNumTranslucentPixels++;
 					}
 					else
 					{
-						m_pimageSource->m_numOutOfRangeValues.fA++;
+						a_imageSource->m_numOutOfRangeValues.fA++;
 					}
 
 					if (m_afrgbaSource[uiPixel].fR != 0.0f)
 					{
-						m_pimageSource->m_numColorValues.fR++;
+						a_imageSource->m_numColorValues.fR++;
 						//make sure we are getting a float between 0-1
 						if (m_afrgbaSource[uiPixel].fR - 1.0f > 0.0f)
 						{
-							m_pimageSource->m_numOutOfRangeValues.fR++;
+							a_imageSource->m_numOutOfRangeValues.fR++;
 						}
 					}
 
 					if (m_afrgbaSource[uiPixel].fG != 0.0f)
 					{
-						m_pimageSource->m_numColorValues.fG++;
+						a_imageSource->m_numColorValues.fG++;
 						if (m_afrgbaSource[uiPixel].fG - 1.0f > 0.0f)
 						{
-							m_pimageSource->m_numOutOfRangeValues.fG++;
+							a_imageSource->m_numOutOfRangeValues.fG++;
 						}
 					}
 					if (m_afrgbaSource[uiPixel].fB != 0.0f)
 					{
-						m_pimageSource->m_numColorValues.fB++;
+						a_imageSource->m_numColorValues.fB++;
 						if (m_afrgbaSource[uiPixel].fB - 1.0f > 0.0f)
 						{
-							m_pimageSource->m_numOutOfRangeValues.fB++;
+							a_imageSource->m_numOutOfRangeValues.fB++;
 						}
 					}
 					// for formats with no alpha, set source alpha to 1

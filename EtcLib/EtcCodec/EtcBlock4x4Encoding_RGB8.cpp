@@ -69,6 +69,7 @@ namespace Etc
 	// a_paucEncodingBits points to the final encoding bits of a previous encoding
 	//
 	void Block4x4Encoding_RGB8::InitFromEncodingBits(Block4x4 *a_pblockParent,
+														Image::Format const a_encoding,
 														unsigned char *a_paucEncodingBits,
 														ColorFloatRGBA *a_pafrgbaSource,
 														ErrorMetric a_errormetric)
@@ -76,6 +77,7 @@ namespace Etc
 		
 		// handle ETC1 modes
 		Block4x4Encoding_ETC1::InitFromEncodingBits(a_pblockParent,
+													a_encoding,
 													a_paucEncodingBits, a_pafrgbaSource,a_errormetric);
 
 		m_pencodingbitsRGB8 = (Block4x4EncodingBits_RGB8 *)a_paucEncodingBits;
@@ -226,14 +228,14 @@ namespace Etc
 	// subsequent iterations generally take longer for each iteration
 	// set m_boolDone if encoding is perfect or encoding is finished based on a_fEffort
 	//
-	void Block4x4Encoding_RGB8::PerformIteration(float a_fEffort)
+	void Block4x4Encoding_RGB8::PerformIteration(Image::Format, ErrorMetric const a_errormetric, float a_fEffort)
 	{
 		assert(!m_boolDone);
 
 		switch (m_uiEncodingIterations)
 		{
 		case 0:
-			Block4x4Encoding_ETC1::PerformFirstIteration();
+			Block4x4Encoding_ETC1::PerformFirstIteration(a_errormetric);
 			if (m_boolDone)
 			{
 				break;
@@ -244,7 +246,7 @@ namespace Etc
 			{
 				break;
 			}
-			TryTAndH(0);
+			TryTAndH(a_errormetric, 0);
 			break;
 
 		case 1:
@@ -272,7 +274,7 @@ namespace Etc
 			break;
 
 		case 6:
-			TryTAndH(1);
+			TryTAndH(a_errormetric, 1);
 			if (a_fEffort <= 59.5f)
 			{
 				m_boolDone = true;
@@ -367,10 +369,10 @@ namespace Etc
 	// try encoding in T mode or H mode
 	// save this encoding if it improves the error
 	//
-	void Block4x4Encoding_RGB8::TryTAndH(unsigned int a_uiRadius)
+	void Block4x4Encoding_RGB8::TryTAndH(ErrorMetric const a_errormetric, unsigned int a_uiRadius)
 	{
 
-		CalculateBaseColorsForTAndH();
+		CalculateBaseColorsForTAndH(a_errormetric);
 
 		TryT(a_uiRadius);
 
@@ -382,10 +384,10 @@ namespace Etc
 	// calculate original values for base colors
 	// store them in m_frgbaOriginalColor1 and m_frgbaOriginalColor2
 	//
-	void Block4x4Encoding_RGB8::CalculateBaseColorsForTAndH(void)
+	void Block4x4Encoding_RGB8::CalculateBaseColorsForTAndH(ErrorMetric const a_errormetric)
 	{
 
-		bool boolRGBX = m_pblockParent->GetImageSource()->GetErrorMetric() == ErrorMetric::RGBX;
+		bool boolRGBX = a_errormetric == ErrorMetric::RGBX;
 
 		ColorFloatRGBA frgbaBlockAverage = (m_frgbaSourceAverageLeft + m_frgbaSourceAverageRight) * 0.5f;
 
@@ -1310,13 +1312,13 @@ namespace Etc
 	// ----------------------------------------------------------------------------------------------------
 	// set the encoding bits based on encoding state
 	//
-	void Block4x4Encoding_RGB8::SetEncodingBits(void)
+	void Block4x4Encoding_RGB8::SetEncodingBits(Image::Format const a_encoding)
 	{
 
 		switch (m_mode)
 		{
 		case MODE_ETC1:
-			Block4x4Encoding_ETC1::SetEncodingBits();
+			Block4x4Encoding_ETC1::SetEncodingBits(a_encoding);
 			break;
 
 		case MODE_T:

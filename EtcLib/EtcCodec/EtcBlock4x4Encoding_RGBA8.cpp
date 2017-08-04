@@ -88,6 +88,7 @@ namespace Etc
 	//
 	void Block4x4Encoding_RGBA8::InitFromSource(Block4x4 *a_pblockParent,
 												ColorFloatRGBA *a_pafrgbaSource,
+												Image::Format,
 												unsigned char *a_paucEncodingBits, ErrorMetric a_errormetric)
 	{
 		Block4x4Encoding::Init(a_pblockParent, a_pafrgbaSource,a_errormetric);
@@ -105,6 +106,7 @@ namespace Etc
 	// a_paucEncodingBits points to the final encoding bits of a previous encoding
 	//
 	void Block4x4Encoding_RGBA8::InitFromEncodingBits(Block4x4 *a_pblockParent,
+														Image::Format const a_encoding,
 														unsigned char *a_paucEncodingBits,
 														ColorFloatRGBA *a_pafrgbaSource,
 														ErrorMetric a_errormetric)
@@ -115,6 +117,7 @@ namespace Etc
 
 		// init RGB portion
 		Block4x4Encoding_RGB8::InitFromEncodingBits(a_pblockParent,
+													a_encoding,
 													(unsigned char *) m_pencodingbitsRGB8,
 													a_pafrgbaSource,
 													a_errormetric);
@@ -166,7 +169,7 @@ namespace Etc
 	//
 	// similar to Block4x4Encoding_RGB8_Base::Encode_RGB8(), but with alpha added
 	//
-	void Block4x4Encoding_RGBA8::PerformIteration(float a_fEffort)
+	void Block4x4Encoding_RGBA8::PerformIteration(Image::Format const a_encoding, ErrorMetric const a_errormetric, float a_fEffort)
 	{
 		assert(!m_boolDone);
 
@@ -186,7 +189,7 @@ namespace Etc
 			}
 		}
 
-		Block4x4Encoding_RGB8::PerformIteration(a_fEffort);
+		Block4x4Encoding_RGB8::PerformIteration(a_encoding, a_errormetric, a_fEffort);
 
 	}
 
@@ -337,11 +340,11 @@ namespace Etc
 	// ----------------------------------------------------------------------------------------------------
 	// set the encoding bits based on encoding state
 	//
-	void Block4x4Encoding_RGBA8::SetEncodingBits(void)
+	void Block4x4Encoding_RGBA8::SetEncodingBits(Image::Format const a_encoding)
 	{
 
 		// set the RGB8 portion
-		Block4x4Encoding_RGB8::SetEncodingBits();
+		Block4x4Encoding_RGB8::SetEncodingBits(a_encoding);
 
 		// set the A8 portion
 		{
@@ -376,7 +379,7 @@ namespace Etc
 	// subsequent iterations generally take longer for each iteration
 	// set m_boolDone if encoding is perfect or encoding is finished based on a_fEffort
 	//
-	void Block4x4Encoding_RGBA8_Opaque::PerformIteration(float a_fEffort)
+	void Block4x4Encoding_RGBA8_Opaque::PerformIteration(Image::Format const a_encoding, ErrorMetric const a_errormetric, float a_fEffort)
 	{
 		assert(!m_boolDone);
 
@@ -390,18 +393,18 @@ namespace Etc
 			}
 		}
 
-		Block4x4Encoding_RGB8::PerformIteration(a_fEffort);
+		Block4x4Encoding_RGB8::PerformIteration(a_encoding, a_errormetric, a_fEffort);
 
 	}
 
 	// ----------------------------------------------------------------------------------------------------
 	// set the encoding bits based on encoding state
 	//
-	void Block4x4Encoding_RGBA8_Opaque::SetEncodingBits(void)
+	void Block4x4Encoding_RGBA8_Opaque::SetEncodingBits(Image::Format const a_encoding)
 	{
 
 		// set the RGB8 portion
-		Block4x4Encoding_RGB8::SetEncodingBits();
+		Block4x4Encoding_RGB8::SetEncodingBits(a_encoding);
 
 		// set the A8 portion
 		m_pencodingbitsA8->data.base = 255;
@@ -426,7 +429,7 @@ namespace Etc
 	// subsequent iterations generally take longer for each iteration
 	// set m_boolDone if encoding is perfect or encoding is finished based on a_fEffort
 	//
-	void Block4x4Encoding_RGBA8_Transparent::PerformIteration(float )
+	void Block4x4Encoding_RGBA8_Transparent::PerformIteration(Image::Format, ErrorMetric, float )
 	{
 		assert(!m_boolDone);
 		assert(m_uiEncodingIterations == 0);
@@ -451,10 +454,10 @@ namespace Etc
 	// ----------------------------------------------------------------------------------------------------
 	// set the encoding bits based on encoding state
 	//
-	void Block4x4Encoding_RGBA8_Transparent::SetEncodingBits(void)
+	void Block4x4Encoding_RGBA8_Transparent::SetEncodingBits(Image::Format const a_encoding)
 	{
 
-		Block4x4Encoding_RGB8::SetEncodingBits();
+		Block4x4Encoding_RGB8::SetEncodingBits(a_encoding);
 
 		// set the A8 portion
 		m_pencodingbitsA8->data.base = 0;

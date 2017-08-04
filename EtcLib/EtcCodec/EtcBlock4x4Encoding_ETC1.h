@@ -34,17 +34,17 @@ namespace Etc
 
 		virtual void InitFromSource(Block4x4 *a_pblockParent,
 									ColorFloatRGBA *a_pafrgbaSource,
-
+									Image::Format a_encoding,
 									unsigned char *a_paucEncodingBits,
 									ErrorMetric a_errormetric) override;
 
 		virtual void InitFromEncodingBits(Block4x4 *a_pblockParent,
+											Image::Format a_encoding,
 											unsigned char *a_paucEncodingBits,
-											ColorFloatRGBA *a_pafrgbaSource, 
-
+											ColorFloatRGBA *a_pafrgbaSource,
 											ErrorMetric a_errormetric) override;
 
-		virtual void PerformIteration(float a_fEffort) override;
+		virtual void PerformIteration(Image::Format a_encoding, ErrorMetric a_errormetric, float a_fEffort) override;
 
 		inline virtual bool GetFlip(void) override
 		{
@@ -56,7 +56,7 @@ namespace Etc
 			return m_boolDiff;
 		}
 
-		virtual void SetEncodingBits(void) override;
+		virtual void SetEncodingBits(Image::Format a_encoding) override;
 
 		void Decode(void);
 
@@ -115,8 +115,8 @@ namespace Etc
 
 		void InitFromEncodingBits_Selectors(void);
 
-		void PerformFirstIteration(void);
-		void CalculateMostLikelyFlip(void);
+		void PerformFirstIteration(ErrorMetric a_errormetric);
+		void CalculateMostLikelyFlip(ErrorMetric a_errormetric);
 
 		void TryDifferential(bool a_boolFlip, unsigned int a_uiRadius,
 								int a_iGrayOffset1, int a_iGrayOffset2);
@@ -179,7 +179,7 @@ namespace Etc
 
 		private:
 
-		void CalculateSourceAverages(void);
+		void CalculateSourceAverages(ErrorMetric a_errormetric);
 
 	};
 

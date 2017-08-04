@@ -36,16 +36,18 @@ namespace Etc
 
 		virtual void InitFromSource(Block4x4 *a_pblockParent,
 									ColorFloatRGBA *a_pafrgbaSource,
+									Image::Format a_encoding,
 									unsigned char *a_paucEncodingBits, ErrorMetric a_errormetric) override;
 
 		virtual void InitFromEncodingBits(Block4x4 *a_pblockParent,
+											Image::Format a_encoding,
 											unsigned char *a_paucEncodingBits,
 											ColorFloatRGBA *a_pafrgbaSource,
 											ErrorMetric a_errormetric) override;
 
-		virtual void PerformIteration(float a_fEffort) override;
+		virtual void PerformIteration(Image::Format a_encoding, ErrorMetric a_errormetric, float a_fEffort) override;
 
-		virtual void SetEncodingBits(void) override;
+		virtual void SetEncodingBits(Image::Format a_encoding) override;
 
 	protected:
 
@@ -94,9 +96,9 @@ namespace Etc
 	{
 	public:
 
-		virtual void PerformIteration(float a_fEffort) override;
+		virtual void PerformIteration(Image::Format a_encoding, ErrorMetric a_errormetric, float a_fEffort) override;
 
-		virtual void SetEncodingBits(void) override;
+		virtual void SetEncodingBits(Image::Format a_encoding) override;
 
 	};
 
@@ -109,9 +111,9 @@ namespace Etc
 	{
 	public:
 
-		virtual void PerformIteration(float a_fEffort) override;
+		virtual void PerformIteration(Image::Format a_encoding, ErrorMetric a_errormetric, float a_fEffort) override;
 
-		virtual void SetEncodingBits(void) override;
+		virtual void SetEncodingBits(Image::Format a_encoding) override;
 
 	};
 

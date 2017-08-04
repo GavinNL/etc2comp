@@ -19,6 +19,7 @@
 #include "EtcColorFloatRGBA.h"
 
 #include "EtcErrorMetric.h"
+#include "EtcImage.h"
 
 #include <cassert>
 #include <cfloat>
@@ -57,18 +58,19 @@ namespace Etc
 		virtual ~Block4x4Encoding(void) {}
 		virtual void InitFromSource(Block4x4 *a_pblockParent,
 									ColorFloatRGBA *a_pafrgbaSource,
-
-									unsigned char *a_paucEncodingBits, ErrorMetric a_errormetric) = 0;
+									Image::Format a_encoding,
+									unsigned char *a_paucEncodingBits,
+									ErrorMetric a_errormetric) = 0;
 
 		virtual void InitFromEncodingBits(Block4x4 *a_pblockParent,
+											Image::Format a_encoding,
 											unsigned char *a_paucEncodingBits,
 											ColorFloatRGBA *a_pafrgbaSource,
-
 											ErrorMetric a_errormetric) = 0;
 
 		// perform an iteration of the encoding
 		// the first iteration must generate a complete, valid (if poor) encoding
-		virtual void PerformIteration(float a_fEffort) = 0;
+		virtual void PerformIteration(Image::Format a_encoding, ErrorMetric a_errormetric, float a_fEffort) = 0;
 
 		void CalcBlockError(void);
 
@@ -89,7 +91,7 @@ namespace Etc
 			return m_afDecodedAlphas;
 		}
 
-		virtual void SetEncodingBits(void) = 0;
+		virtual void SetEncodingBits(Image::Format a_encoding) = 0;
 
 		virtual bool GetFlip(void) = 0;
 

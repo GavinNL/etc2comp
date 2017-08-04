@@ -78,12 +78,14 @@ namespace Etc
 	//
 	void Block4x4Encoding_RGB8A1::InitFromSource(Block4x4 *a_pblockParent,
 													ColorFloatRGBA *a_pafrgbaSource,
+													Image::Format const a_encoding,
 													unsigned char *a_paucEncodingBits,
 													ErrorMetric a_errormetric)
 	{
 
 		Block4x4Encoding_RGB8::InitFromSource(a_pblockParent,
 			a_pafrgbaSource,
+			a_encoding,
 			a_paucEncodingBits,
 			a_errormetric);
 
@@ -113,6 +115,7 @@ namespace Etc
 	// a_paucEncodingBits points to the final encoding bits of a previous encoding
 	//
 	void Block4x4Encoding_RGB8A1::InitFromEncodingBits(Block4x4 *a_pblockParent,
+														Image::Format,
 														unsigned char *a_paucEncodingBits,
 														ColorFloatRGBA *a_pafrgbaSource,
 														ErrorMetric a_errormetric)
@@ -421,7 +424,7 @@ namespace Etc
 	// RGB8A1 can't use individual mode
 	// RGB8A1 with transparent pixels can't use planar mode
 	//
-	void Block4x4Encoding_RGB8A1::PerformIteration(float a_fEffort)
+	void Block4x4Encoding_RGB8A1::PerformIteration(Image::Format a_encoding, ErrorMetric const a_errormetric, float a_fEffort)
 	{
 		assert(!m_boolOpaque);
 		assert(!m_boolTransparent);
@@ -430,7 +433,7 @@ namespace Etc
 		switch (m_uiEncodingIterations)
 		{
 		case 0:
-			PerformFirstIteration();
+			PerformFirstIteration(a_errormetric);
 			break;
 
 		case 1:
@@ -446,7 +449,7 @@ namespace Etc
 			break;
 
 		case 3:
-			Block4x4Encoding_RGB8::CalculateBaseColorsForTAndH();
+			Block4x4Encoding_RGB8::CalculateBaseColorsForTAndH(a_errormetric);
 			TryT(1);
 			TryH(1);
 			if (a_fEffort <= 49.5f)
@@ -498,9 +501,9 @@ namespace Etc
 	// ----------------------------------------------------------------------------------------------------
 	// find best initial encoding to ensure block has a valid encoding
 	//
-	void Block4x4Encoding_RGB8A1::PerformFirstIteration(void)
+	void Block4x4Encoding_RGB8A1::PerformFirstIteration(ErrorMetric const a_errormetric)
 	{
-		Block4x4Encoding_ETC1::CalculateMostLikelyFlip();
+		Block4x4Encoding_ETC1::CalculateMostLikelyFlip(a_errormetric);
 
 		m_fError = FLT_MAX;
 
@@ -1415,7 +1418,7 @@ namespace Etc
 	// ----------------------------------------------------------------------------------------------------
 	// set the encoding bits based on encoding state
 	//
-	void Block4x4Encoding_RGB8A1::SetEncodingBits(void)
+	void Block4x4Encoding_RGB8A1::SetEncodingBits(Image::Format)
 	{
 		switch (m_mode)
 		{
@@ -1659,7 +1662,7 @@ namespace Etc
 	// subsequent iterations generally take longer for each iteration
 	// set m_boolDone if encoding is perfect or encoding is finished based on a_fEffort
 	//
-	void Block4x4Encoding_RGB8A1_Opaque::PerformIteration(float a_fEffort)
+	void Block4x4Encoding_RGB8A1_Opaque::PerformIteration(Image::Format const a_encoding, ErrorMetric const a_errormetric, float a_fEffort)
 	{
 		assert(!m_boolPunchThroughPixels);
 		assert(!m_boolTransparent);
@@ -1668,7 +1671,7 @@ namespace Etc
 		switch (m_uiEncodingIterations)
 		{
 		case 0:
-			PerformFirstIteration();
+			PerformFirstIteration(a_errormetric);
 			break;
 
 		case 1:
@@ -1684,7 +1687,7 @@ namespace Etc
 			break;
 
 		case 4:
-			Block4x4Encoding_RGB8::TryTAndH(1);
+			Block4x4Encoding_RGB8::TryTAndH(a_errormetric, 1);
 			if (a_fEffort <= 49.5f)
 			{
 				m_boolDone = true;
@@ -1732,7 +1735,7 @@ namespace Etc
 	// ----------------------------------------------------------------------------------------------------
 	// find best initial encoding to ensure block has a valid encoding
 	//
-	void Block4x4Encoding_RGB8A1_Opaque::PerformFirstIteration(void)
+	void Block4x4Encoding_RGB8A1_Opaque::PerformFirstIteration(ErrorMetric const a_errormetric)
 	{
 		
 		// set decoded alphas
@@ -1746,7 +1749,7 @@ namespace Etc
 			m_fError += fDeltaA * fDeltaA;
 		}
 
-		CalculateMostLikelyFlip();
+		CalculateMostLikelyFlip(a_errormetric);
 
 		m_fError = FLT_MAX;
 
@@ -1768,7 +1771,7 @@ namespace Etc
 		{
 			return;
 		}
-		Block4x4Encoding_RGB8::TryTAndH(0);
+		Block4x4Encoding_RGB8::TryTAndH(a_errormetric, 0);
 		SetDoneIfPerfect();
 	}
 
@@ -1782,7 +1785,7 @@ namespace Etc
 	// subsequent iterations generally take longer for each iteration
 	// set m_boolDone if encoding is perfect or encoding is finished based on a_fEffort
 	//
-	void Block4x4Encoding_RGB8A1_Transparent::PerformIteration(float )
+	void Block4x4Encoding_RGB8A1_Transparent::PerformIteration(Image::Format, ErrorMetric, float )
 	{
 		assert(!m_boolOpaque);
 		assert(m_boolTransparent);

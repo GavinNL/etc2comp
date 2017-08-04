@@ -112,7 +112,9 @@ namespace Etc
 	//
 	void Block4x4Encoding_ETC1::InitFromSource(Block4x4 *a_pblockParent,
 												ColorFloatRGBA *a_pafrgbaSource,
-												unsigned char *a_paucEncodingBits, ErrorMetric a_errormetric)
+												Image::Format const,
+												unsigned char *a_paucEncodingBits,
+												ErrorMetric a_errormetric)
 	{
 
 		Block4x4Encoding::Init(a_pblockParent, a_pafrgbaSource,a_errormetric);
@@ -136,8 +138,9 @@ namespace Etc
 	// a_paucEncodingBits points to the final encoding bits of a previous encoding
 	//
 	void Block4x4Encoding_ETC1::InitFromEncodingBits(Block4x4 *a_pblockParent,
+														Image::Format,
 														unsigned char *a_paucEncodingBits,
-														ColorFloatRGBA *a_pafrgbaSource, 
+														ColorFloatRGBA *a_pafrgbaSource,
 														ErrorMetric a_errormetric)
 	{
 
@@ -229,14 +232,14 @@ namespace Etc
 	// subsequent iterations generally take longer for each iteration
 	// set m_boolDone if encoding is perfect or encoding is finished based on a_fEffort
 	//
-	void Block4x4Encoding_ETC1::PerformIteration(float a_fEffort)
+	void Block4x4Encoding_ETC1::PerformIteration(Image::Format, ErrorMetric const a_errormetric, float a_fEffort)
 	{
 		assert(!m_boolDone);
 
 		switch (m_uiEncodingIterations)
 		{
 		case 0:
-			PerformFirstIteration();
+			PerformFirstIteration(a_errormetric);
 			break;
 
 		case 1:
@@ -308,9 +311,9 @@ namespace Etc
 	// ----------------------------------------------------------------------------------------------------
 	// find best initial encoding to ensure block has a valid encoding
 	//
-	void Block4x4Encoding_ETC1::PerformFirstIteration(void)
+	void Block4x4Encoding_ETC1::PerformFirstIteration(ErrorMetric const a_errormetric)
 	{
-		CalculateMostLikelyFlip();
+		CalculateMostLikelyFlip(a_errormetric);
 
 		m_fError = FLT_MAX;
 
@@ -347,11 +350,11 @@ namespace Etc
 	// h_error is the sum of Left and Right errors
 	// v_error is the sum of Top and Bottom errors
 	//
-	void Block4x4Encoding_ETC1::CalculateMostLikelyFlip(void)
+	void Block4x4Encoding_ETC1::CalculateMostLikelyFlip(ErrorMetric a_errormetric)
 	{
 		static const bool DEBUG_PRINT = false;
 
-		CalculateSourceAverages();
+		CalculateSourceAverages(a_errormetric);
 
 		float fLeftGrayErrorSum = 0.0f;
 		float fRightGrayErrorSum = 0.0f;
@@ -391,11 +394,11 @@ namespace Etc
 	// ignore pixels that have alpha == NAN (these are border pixels outside of the source image)
 	// weight the averages based on a pixel's alpha
 	//
-	void Block4x4Encoding_ETC1::CalculateSourceAverages(void)
+	void Block4x4Encoding_ETC1::CalculateSourceAverages(ErrorMetric const a_errormetric)
 	{
 		static const bool DEBUG_PRINT = false;
 
-		bool boolRGBX = m_pblockParent->GetImageSource()->GetErrorMetric() == ErrorMetric::RGBX;
+		bool boolRGBX = a_errormetric == ErrorMetric::RGBX;
 
 		if (m_pblockParent->GetSourceAlphaMix() == Block4x4::SourceAlphaMix::OPAQUE || boolRGBX)
 		{
@@ -1182,7 +1185,7 @@ namespace Etc
 	// ----------------------------------------------------------------------------------------------------
 	// set the encoding bits based on encoding state
 	//
-	void Block4x4Encoding_ETC1::SetEncodingBits(void)
+	void Block4x4Encoding_ETC1::SetEncodingBits(Image::Format)
 	{
 		assert(m_mode == MODE_ETC1);
 

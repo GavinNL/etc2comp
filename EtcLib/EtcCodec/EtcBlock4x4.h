@@ -64,14 +64,14 @@ namespace Etc
 										ErrorMetric a_errormetric);
 
 		// return true if final iteration was performed
-		inline void PerformEncodingIteration(float a_fEffort)
+		inline void PerformEncodingIteration(Image::Format const a_encoding, ErrorMetric const a_errormetric, float a_fEffort)
 		{
-			m_pencoding->PerformIteration(a_fEffort);
+			m_pencoding->PerformIteration(a_encoding, a_errormetric, a_fEffort);
 		}
 
-		inline void SetEncodingBitsFromEncoding(void)
+		inline void SetEncodingBitsFromEncoding(Image::Format const a_encoding)
 		{
-			m_pencoding->SetEncodingBits();
+			m_pencoding->SetEncodingBits(a_encoding);
 		}
 
 		inline unsigned int GetSourceH(void) const
@@ -138,11 +138,6 @@ namespace Etc
 			return m_sourcealphamix;
 		}
 
-		inline Image * GetImageSource(void)
-		{
-			return m_pimageSource;
-		}
-
 		inline bool HasBorderPixels(void) const
 		{
 			return m_boolBorderPixels;
@@ -155,9 +150,8 @@ namespace Etc
 
 	private:
 
-		void SetSourcePixels(void);
+		void SetSourcePixels(Image *a_imageSource);
 
-		Image				*m_pimageSource;
 		unsigned int		m_uiSourceH;
 		unsigned int		m_uiSourceV;
 		ErrorMetric			m_errormetric;

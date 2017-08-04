@@ -52,6 +52,7 @@ namespace Etc
 	//
 	void Block4x4Encoding_RG11::InitFromSource(Block4x4 *a_pblockParent,
 		ColorFloatRGBA *a_pafrgbaSource,
+		Image::Format,
 		unsigned char *a_paucEncodingBits, ErrorMetric a_errormetric)
 	{
 		Block4x4Encoding::Init(a_pblockParent, a_pafrgbaSource,a_errormetric);
@@ -67,6 +68,7 @@ namespace Etc
 	// a_paucEncodingBits points to the final encoding bits of a previous encoding
 	//
 	void Block4x4Encoding_RG11::InitFromEncodingBits(Block4x4 *a_pblockParent,
+		Image::Format const a_encoding,
 		unsigned char *a_paucEncodingBits,
 		ColorFloatRGBA *a_pafrgbaSource,
 		ErrorMetric a_errormetric)
@@ -76,6 +78,7 @@ namespace Etc
 
 		// init RGB portion
 		Block4x4Encoding_RGB8::InitFromEncodingBits(a_pblockParent,
+			a_encoding,
 			(unsigned char *)m_pencodingbitsRG11,
 			a_pafrgbaSource,
 			a_errormetric);
@@ -83,7 +86,7 @@ namespace Etc
 
 		{
 			m_mode = MODE_RG11;
-			if (a_pblockParent->GetImageSource()->GetFormat() == Image::Format::SIGNED_RG11)
+			if (a_encoding == Image::Format::SIGNED_RG11)
 			{
 				m_fRedBase = (float)(signed char)m_pencodingbitsRG11->data.baseR;
 				m_fGrnBase = (float)(signed char)m_pencodingbitsRG11->data.baseG;
@@ -127,12 +130,12 @@ namespace Etc
 			{
 				float fRedDecodedData = 0.0f;
 				float fGrnDecodedData = 0.0f;
-				if (a_pblockParent->GetImageSource()->GetFormat() == Image::Format::RG11)
+				if (a_encoding == Image::Format::RG11)
 				{
 					fRedDecodedData = DecodePixelRed(m_fRedBase, m_fRedMultiplier, m_uiRedModifierTableIndex, m_auiRedSelectors[uiPixel]);
 					fGrnDecodedData = DecodePixelRed(m_fGrnBase, m_fGrnMultiplier, m_uiGrnModifierTableIndex, m_auiGrnSelectors[uiPixel]);
 				}
-				else if (a_pblockParent->GetImageSource()->GetFormat() == Image::Format::SIGNED_RG11)
+				else if (a_encoding == Image::Format::SIGNED_RG11)
 				{
 					fRedDecodedData = DecodePixelRed(m_fRedBase + 128, m_fRedMultiplier, m_uiRedModifierTableIndex, m_auiRedSelectors[uiPixel]);
 					fGrnDecodedData = DecodePixelRed(m_fGrnBase + 128, m_fGrnMultiplier, m_uiGrnModifierTableIndex, m_auiGrnSelectors[uiPixel]);
@@ -155,7 +158,7 @@ namespace Etc
 	// subsequent iterations generally take longer for each iteration
 	// set m_boolDone if encoding is perfect or encoding is finished based on a_fEffort
 	//
-	void Block4x4Encoding_RG11::PerformIteration(float a_fEffort)
+	void Block4x4Encoding_RG11::PerformIteration(Image::Format const a_encoding, ErrorMetric, float a_fEffort)
 	{
 		assert(!m_boolDone);
 
@@ -165,14 +168,14 @@ namespace Etc
 			m_fError = FLT_MAX;
 			m_fGrnBlockError = FLT_MAX;		// artificially high value
 			m_fRedBlockError = FLT_MAX;
-			CalculateR11(8, 0.0f, 0.0f);
-			CalculateG11(8, 0.0f, 0.0f);
+			CalculateR11(a_encoding, 8, 0.0f, 0.0f);
+			CalculateG11(a_encoding, 8, 0.0f, 0.0f);
 			m_fError = (m_fGrnBlockError + m_fRedBlockError);
 			break;
 
 		case 1:
-			CalculateR11(8, 2.0f, 1.0f);
-			CalculateG11(8, 2.0f, 1.0f);
+			CalculateR11(a_encoding, 8, 2.0f, 1.0f);
+			CalculateG11(a_encoding, 8, 2.0f, 1.0f);
 			m_fError = (m_fGrnBlockError + m_fRedBlockError);
 			if (a_fEffort <= 24.5f)
 			{
@@ -181,8 +184,8 @@ namespace Etc
 			break;
 
 		case 2:
-			CalculateR11(8, 12.0f, 1.0f);
-			CalculateG11(8, 12.0f, 1.0f);
+			CalculateR11(a_encoding, 8, 12.0f, 1.0f);
+			CalculateG11(a_encoding, 8, 12.0f, 1.0f);
 			m_fError = (m_fGrnBlockError + m_fRedBlockError);
 			if (a_fEffort <= 49.5f)
 			{
@@ -191,20 +194,20 @@ namespace Etc
 			break;
 
 		case 3:
-			CalculateR11(7, 6.0f, 1.0f);
-			CalculateG11(7, 6.0f, 1.0f);
+			CalculateR11(a_encoding, 7, 6.0f, 1.0f);
+			CalculateG11(a_encoding, 7, 6.0f, 1.0f);
 			m_fError = (m_fGrnBlockError + m_fRedBlockError);
 			break;
 
 		case 4:
-			CalculateR11(6, 3.0f, 1.0f);
-			CalculateG11(6, 3.0f, 1.0f);
+			CalculateR11(a_encoding, 6, 3.0f, 1.0f);
+			CalculateG11(a_encoding, 6, 3.0f, 1.0f);
 			m_fError = (m_fGrnBlockError + m_fRedBlockError);
 			break;
 
 		case 5:
-			CalculateR11(5, 1.0f, 0.0f);
-			CalculateG11(5, 1.0f, 0.0f);
+			CalculateR11(a_encoding, 5, 1.0f, 0.0f);
+			CalculateG11(a_encoding, 5, 1.0f, 0.0f);
 			m_fError = (m_fGrnBlockError + m_fRedBlockError);
 			m_boolDone = true;
 			break;
@@ -225,7 +228,8 @@ namespace Etc
 	// a_fBaseRadius limits the range of base colors to try
 	// a_fMultiplierRadius limits the range of multipliers to try
 	//
-	void Block4x4Encoding_RG11::CalculateG11(unsigned int a_uiSelectorsUsed,
+	void Block4x4Encoding_RG11::CalculateG11(Image::Format const a_format,
+		unsigned int a_uiSelectorsUsed,
 		float a_fBaseRadius, float a_fMultiplierRadius)
 	{
 		// maps from virtual (monotonic) selector to etc selector
@@ -355,11 +359,11 @@ namespace Etc
 						{
 							m_fGrnBlockError = fBlockError;
 
-							if (m_pblockParent->GetImageSource()->GetFormat() == Image::Format::RG11)
+							if (a_format == Image::Format::RG11)
 							{
 								m_fGrnBase = 255.0f * fBase;
 							}
-							else if (m_pblockParent->GetImageSource()->GetFormat() == Image::Format::SIGNED_RG11)
+							else if (a_format == Image::Format::SIGNED_RG11)
 							{
 								m_fGrnBase = (fBase * 255) - 128;
 							}
@@ -386,7 +390,7 @@ namespace Etc
 	// ----------------------------------------------------------------------------------------------------
 	// set the encoding bits based on encoding state
 	//
-	void Block4x4Encoding_RG11::SetEncodingBits(void)
+	void Block4x4Encoding_RG11::SetEncodingBits(Image::Format const a_encoding)
 	{
 		unsigned long long int ulliSelectorBitsR = 0;
 		unsigned long long int ulliSelectorBitsG = 0;
@@ -396,11 +400,11 @@ namespace Etc
 			ulliSelectorBitsR |= ((unsigned long long int)m_auiRedSelectors[uiPixel]) << uiShift;
 			ulliSelectorBitsG |= ((unsigned long long int)m_auiGrnSelectors[uiPixel]) << uiShift;
 		}
-		if (m_pblockParent->GetImageSource()->GetFormat() == Image::Format::RG11)
+		if (a_encoding == Image::Format::RG11)
 		{
 			m_pencodingbitsRG11->data.baseR = (unsigned char)roundf(m_fRedBase);
 		}
-		else if (m_pblockParent->GetImageSource()->GetFormat() == Image::Format::SIGNED_RG11)
+		else if (a_encoding == Image::Format::SIGNED_RG11)
 		{
 			m_pencodingbitsRG11->data.baseR = (signed char)roundf(m_fRedBase);
 		}
@@ -418,11 +422,11 @@ namespace Etc
 		m_pencodingbitsRG11->data.selectorsR4 = ulliSelectorBitsR >> 8;
 		m_pencodingbitsRG11->data.selectorsR5 = ulliSelectorBitsR;
 
-		if (m_pblockParent->GetImageSource()->GetFormat() == Image::Format::RG11)
+		if (a_encoding == Image::Format::RG11)
 		{
 			m_pencodingbitsRG11->data.baseG = (unsigned char)roundf(m_fGrnBase);
 		}
-		else if (m_pblockParent->GetImageSource()->GetFormat() == Image::Format::SIGNED_RG11)
+		else if (a_encoding == Image::Format::SIGNED_RG11)
 		{
 			m_pencodingbitsRG11->data.baseG = (signed char)roundf(m_fGrnBase);
 		}

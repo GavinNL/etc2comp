@@ -41,22 +41,24 @@ namespace Etc
 
 		virtual void InitFromSource(Block4x4 *a_pblockParent,
 			ColorFloatRGBA *a_pafrgbaSource,
-
-			unsigned char *a_paucEncodingBits, ErrorMetric a_errormetric) override;
+			Image::Format a_encoding,
+			unsigned char *a_paucEncodingBits,
+			ErrorMetric a_errormetric) override;
 
 		virtual void InitFromEncodingBits(Block4x4 *a_pblockParent,
+			Image::Format a_encoding,
 			unsigned char *a_paucEncodingBits,
 			ColorFloatRGBA *a_pafrgbaSource,
 
 			ErrorMetric a_errormetric) override;
 
-		virtual void PerformIteration(float a_fEffort) override;
+		virtual void PerformIteration(Image::Format a_encoding, ErrorMetric a_errormetric, float a_fEffort) override;
 
-		virtual void SetEncodingBits(void) override;
+		virtual void SetEncodingBits(Image::Format a_encoding) override;
 
 		Block4x4EncodingBits_RG11 *m_pencodingbitsRG11;
 
-		void CalculateG11(unsigned int a_uiSelectorsUsed, float a_fBaseRadius, float a_fMultiplierRadius);
+		void CalculateG11(Image::Format a_format, unsigned int a_uiSelectorsUsed, float a_fBaseRadius, float a_fMultiplierRadius);
 
 		inline float GetGrnBase(void) const
 		{
