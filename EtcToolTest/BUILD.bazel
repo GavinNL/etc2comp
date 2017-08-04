@@ -1,0 +1,18 @@
+
+py_test(
+    name = "EtcToolTest",
+    srcs = [
+        "EtcToolTest.py",
+    ],
+    args = [
+        "$(location //EtcTool)",
+        "$(location @com_github_openimageio_oiio_images//:oiio-logo-with-alpha.png)",
+        "$(location expected)",
+    ],
+    data = [
+        "@com_github_openimageio_oiio_images//:oiio-logo-with-alpha.png",
+        "//EtcTool",
+        "expected",
+    ],
+    visibility = ["//visibility:public"],
+)

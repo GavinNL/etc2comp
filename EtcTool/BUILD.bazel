@@ -21,4 +21,5 @@ cc_binary(
         "//third_party/lodepng",
         "//EtcLib",
     ],
+    visibility = ["//visibility:public"],
 )
