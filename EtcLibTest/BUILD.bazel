@@ -1,0 +1,21 @@
+
+load("//:cxx.bzl", "cxx_test")
+
+cxx_test(
+    name = "EtcBlock4x4Test",
+    srcs = [
+        "EtcBlock4x4Test.cpp",
+    ],
+    deps = [
+        "@com_google_googletest//:googletest",
+        "//EtcLib",
+    ],
+    size = "small",
+)
+
+test_suite(
+    name = "small_tests",
+    tags = [
+        "small",
+    ],
+)
