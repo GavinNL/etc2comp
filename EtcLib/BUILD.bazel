@@ -8,6 +8,7 @@ cxx_library(
         "Etc/EtcColor.h",
         "Etc/EtcColorFloatRGBA.h",
         "Etc/EtcConfig.h",
+        "Etc/EtcExecutor.h",
         "Etc/EtcFilter.h",
         "Etc/EtcMath.h",
         "Etc/EtcImage.h",
@@ -26,6 +27,7 @@ cxx_library(
         "EtcCodec/EtcBlock4x4Encoding_RGBA8.h",
     ],
     srcs = [
+        "Etc/EtcExecutor.cpp",
         "Etc/EtcFilter.cpp",
         "Etc/EtcMath.cpp",
         "Etc/Etc.cpp",

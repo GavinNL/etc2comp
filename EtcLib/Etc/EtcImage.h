@@ -28,12 +28,12 @@ namespace Etc
 {
 	class Block4x4;
 	class EncoderSpec;
+	class Executor;
 	class SortedBlockList;
 
     class Image
     {
     public:
-		using Milliseconds = std::chrono::milliseconds;
 
 		//the differnt warning and errors that can come up during encoding
 		enum  EncodingStatus
@@ -96,9 +96,10 @@ namespace Etc
 				ErrorMetric a_errormetric);
 
 		~Image(void);
-
+private:
 		EncodingStatus Encode(Format a_format, ErrorMetric a_errormetric, float a_fEffort, 
 			unsigned int a_uiJobs, unsigned int a_uiMaxJobs);
+public:
 
 		inline void AddToEncodingStatus(EncodingStatus a_encStatus)
 		{
@@ -143,11 +144,6 @@ namespace Etc
 		inline unsigned int GetEncodingBitsBytes(void)
 		{
 			return m_uiEncodingBitsBytes;
-		}
-
-		inline Milliseconds GetEncodingTime(void)
-		{
-			return m_msEncodeTime;
 		}
 
 		float GetError(void);
@@ -239,14 +235,13 @@ namespace Etc
 		unsigned char *m_paucEncodingBits;
 		ErrorMetric m_errormetric;
 		float m_fEffort;
-		// stats
-		Milliseconds m_msEncodeTime;
 		
 		SortedBlockList *m_psortedblocklist;
 		//this will hold any warning or errors that happen during encoding
 		EncodingStatus m_encodingStatus;
 		//these will be the warnings we are tracking
 		EncodingStatus m_warningsToCapture;
+		friend class Executor;
 	};
 
 } // namespace Etc

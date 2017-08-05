@@ -105,8 +105,6 @@ namespace Etc
 		m_errormetric = a_errormetric;
 		m_fEffort = 0.0f;
 
-		m_msEncodeTime = Milliseconds::zero();
-
 		m_iNumOpaquePixels = 0;
 		m_iNumTranslucentPixels = 0;
 		m_iNumTransparentPixels = 0;
@@ -157,7 +155,6 @@ namespace Etc
 		m_errormetric = a_errormetric;
 		m_fEffort = 0.0f;
 		m_bVerboseOutput = false;
-		m_msEncodeTime = Milliseconds::zero();
 		
 		unsigned char *paucEncodingBits = m_paucEncodingBits;
 		unsigned int uiEncodingBitsBytesPerBlock = Block4x4EncodingBits::GetBytesPerBlock(m_encodingbitsformat);
@@ -205,9 +202,6 @@ namespace Etc
 	//
 	Image::EncodingStatus Image::Encode(Format a_format, ErrorMetric a_errormetric, float a_fEffort, unsigned int a_uiJobs, unsigned int a_uiMaxJobs)
 	{
-
-		auto const start = std::chrono::steady_clock::now();
-		
 		m_encodingStatus = EncodingStatus::SUCCESS;
 
 		m_format = a_format;
@@ -361,10 +355,6 @@ namespace Etc
 		{
 			handle[i].get();
 		}
-
-		auto const end = std::chrono::steady_clock::now();
-		auto const elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-		m_msEncodeTime = elapsed;
 
 		delete[] handle;
 		delete m_psortedblocklist;

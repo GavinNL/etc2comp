@@ -17,6 +17,7 @@
 #pragma once
 
 #include "EtcColor.h"
+#include "EtcExecutor.h"
 
 namespace Etc
 {
@@ -62,6 +63,7 @@ namespace Etc
 									ColorR8G8B8A8 *a_pargba8Output,
 									unsigned int a_uiOutputWidth);
 
+		Executor		m_executor;
 		Image			*m_pimage;
 		const char		*m_pstrOutputFolder;
 		unsigned int	m_uiComparisons;

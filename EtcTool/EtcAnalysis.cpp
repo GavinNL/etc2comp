@@ -38,6 +38,7 @@ namespace Etc
 	// ----------------------------------------------------------------------------------------------------
 	//
 	Analysis::Analysis(Image *a_pimage, const char *a_pstrOutputFolder)
+		: m_executor(*a_pimage)
 	{
 
 		m_pimage = a_pimage;
@@ -94,7 +95,7 @@ namespace Etc
 					fprintf(apfile[i], "PSNR(rgba) = %.4f\n", ConvertErrorToPSNR(fImageError, (iComponents+1) * uiImagePixels));
 				}
 				
-				fprintf(apfile[i], "EncodeTime = %.3f seconds\n", (float)m_pimage->GetEncodingTime().count() / 1000.0f);
+				fprintf(apfile[i], "EncodeTime = %.3f seconds\n", static_cast<float>(m_executor.GetEncodingTime().count()) / 1000.0f);
 			}
 
 

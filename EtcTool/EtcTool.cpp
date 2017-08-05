@@ -261,10 +261,11 @@ int main(int argc, const char * argv[])
 		image.m_bVerboseOutput = commands.verboseOutput;
 		Etc::Image::EncodingStatus encStatus = Etc::Image::EncodingStatus::SUCCESS;
 		
-		encStatus = image.Encode(commands.format, commands.e_ErrMetric, commands.fEffort, commands.uiJobs,MAX_JOBS);
+		Etc::Executor executor(image);
+		encStatus = executor.Encode(commands.format, commands.e_ErrMetric, commands.fEffort, commands.uiJobs,MAX_JOBS);
 		if (commands.verboseOutput)
 		{
-			printf("  encode time = %ldms\n", image.GetEncodingTime().count());
+			printf("  encode time = %ldms\n", executor.GetEncodingTime().count());
 			printf("EncodedImage: %s\n", commands.pstrOutputFilename);
 			printf("status bitfield: %u\n", encStatus);
 		}

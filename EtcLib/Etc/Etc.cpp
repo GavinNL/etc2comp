@@ -16,6 +16,7 @@
 
 #include "EtcConfig.h"
 #include "Etc.h"
+#include "EtcExecutor.h"
 #include "EtcFilter.h"
 
 #include <cstring>
@@ -43,14 +44,15 @@ namespace Etc
 		Image image(a_pafSourceRGBA, a_uiSourceWidth,
 					a_uiSourceHeight,
 					a_eErrMetric);
+		Executor executor(image);
 		image.m_bVerboseOutput = a_bVerboseOutput;
-		image.Encode(a_format, a_eErrMetric, a_fEffort, a_uiJobs, a_uiMaxJobs);
+		executor.Encode(a_format, a_eErrMetric, a_fEffort, a_uiJobs, a_uiMaxJobs);
 
 		*a_ppaucEncodingBits = image.GetEncodingBits();
 		*a_puiEncodingBitsBytes = image.GetEncodingBitsBytes();
 		*a_puiExtendedWidth = image.GetExtendedWidth();
 		*a_puiExtendedHeight = image.GetExtendedHeight();
-		*a_piEncodingTime_ms = image.GetEncodingTime().count();
+		*a_piEncodingTime_ms = executor.GetEncodingTime().count();
 	}
 
 	void EncodeMipmaps(float *a_pafSourceRGBA,
@@ -92,16 +94,16 @@ namespace Etc
 			{
 			
 				Image image(pImageData, mipWidth, mipHeight,	a_eErrMetric);
-
+				Executor executor(image);
 			image.m_bVerboseOutput = a_bVerboseOutput;
-			image.Encode(a_format, a_eErrMetric, a_fEffort, a_uiJobs, a_uiMaxJobs);
+				executor.Encode(a_format, a_eErrMetric, a_fEffort, a_uiJobs, a_uiMaxJobs);
 
 			a_pMipmapImages[mip].paucEncodingBits = std::shared_ptr<unsigned char>(image.GetEncodingBits(), [](unsigned char *p) { delete[] p; });
 			a_pMipmapImages[mip].uiEncodingBitsBytes = image.GetEncodingBitsBytes();
 			a_pMipmapImages[mip].uiExtendedWidth = image.GetExtendedWidth();
 			a_pMipmapImages[mip].uiExtendedHeight = image.GetExtendedHeight();
 
-			totalEncodingTime += image.GetEncodingTime().count();
+				totalEncodingTime += executor.GetEncodingTime().count();
 			}
 
 			if(pMipImage)
