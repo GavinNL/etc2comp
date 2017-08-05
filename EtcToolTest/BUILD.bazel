@@ -16,5 +16,14 @@ go_test(
         "//EtcTool",
         "expected",
     ],
+    size = "small",
     visibility = ["//visibility:public"],
 )
+
+test_suite(
+    name = "small_tests",
+    tags = [
+        "small",
+    ],
+)
+

@@ -2,3 +2,11 @@ load("@io_bazel_rules_go//go:def.bzl", "go_prefix", "gazelle")
 
 go_prefix("github.com/abergmeier/double-compress")
 gazelle(name = "gazelle")
+
+test_suite(
+    name = "all_small_tests",
+    tests = [
+        "//EtcLibTest:small_tests",
+        "//EtcToolTest:small_tests",
+    ],
+)
