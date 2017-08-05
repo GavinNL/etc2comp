@@ -1,5 +1,7 @@
 
-cc_library(
+load("//:cxx.bzl", "cxx_library")
+
+cxx_library(
     name = "EtcLib",
     hdrs = [
         "Etc/Etc.h",

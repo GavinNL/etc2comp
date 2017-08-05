@@ -1,5 +1,7 @@
 
-cc_binary(
+load("//:cxx.bzl", "cxx_binary")
+
+cxx_binary(
     name = "EtcTool",
     srcs = [
         "EtcAnalysis.h",
