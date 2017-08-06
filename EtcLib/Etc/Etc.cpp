@@ -45,7 +45,7 @@ namespace Etc
 					a_uiSourceHeight,
 					a_eErrMetric);
 		Executor executor(image);
-		image.m_bVerboseOutput = a_bVerboseOutput;
+		executor.m_bVerboseOutput = a_bVerboseOutput;
 		executor.Encode(a_format, a_eErrMetric, a_fEffort, a_uiJobs, a_uiMaxJobs);
 
 		*a_ppaucEncodingBits = image.GetEncodingBits();
@@ -95,7 +95,7 @@ namespace Etc
 			
 				Image image(pImageData, mipWidth, mipHeight,	a_eErrMetric);
 				Executor executor(image);
-			image.m_bVerboseOutput = a_bVerboseOutput;
+				executor.m_bVerboseOutput = a_bVerboseOutput;
 				executor.Encode(a_format, a_eErrMetric, a_fEffort, a_uiJobs, a_uiMaxJobs);
 
 			a_pMipmapImages[mip].paucEncodingBits = std::shared_ptr<unsigned char>(image.GetEncodingBits(), [](unsigned char *p) { delete[] p; });

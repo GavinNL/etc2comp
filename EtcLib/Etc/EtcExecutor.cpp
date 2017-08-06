@@ -13,7 +13,7 @@ namespace Etc {
 
 		auto const start = std::chrono::steady_clock::now();
 
-		auto status = m_image.Encode(a_format, a_errormetric, a_fEffort, a_uiJobs, a_uiMaxJobs);
+		auto status = m_image.Encode(*this, a_format, a_errormetric, a_fEffort, a_uiJobs, a_uiMaxJobs);
 
 		auto const end = std::chrono::steady_clock::now();
 		auto const elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);

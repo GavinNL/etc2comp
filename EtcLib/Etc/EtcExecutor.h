@@ -26,6 +26,8 @@ namespace Etc {
 		// stats
 		Milliseconds m_msEncodeTime = Milliseconds::zero();
 		Image& m_image;
+	public:
+		bool m_bVerboseOutput = false;
 	};
 
 } // namespace Etc

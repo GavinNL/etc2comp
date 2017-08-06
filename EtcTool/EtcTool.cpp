@@ -258,10 +258,10 @@ int main(int argc, const char * argv[])
 		Etc::Image image((float *)sourceimage.GetPixels(),
 							uiSourceWidth, uiSourceHeight,
 							commands.e_ErrMetric);
-		image.m_bVerboseOutput = commands.verboseOutput;
+		Etc::Executor executor(image);
+		executor.m_bVerboseOutput = commands.verboseOutput;
 		Etc::Image::EncodingStatus encStatus = Etc::Image::EncodingStatus::SUCCESS;
 		
-		Etc::Executor executor(image);
 		encStatus = executor.Encode(commands.format, commands.e_ErrMetric, commands.fEffort, commands.uiJobs,MAX_JOBS);
 		if (commands.verboseOutput)
 		{

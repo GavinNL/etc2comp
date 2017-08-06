@@ -67,7 +67,7 @@ namespace Etc
 			FILE *apfile[2];
 			apfile[0] = pfileTxt;
 			
-			if (m_pimage->m_bVerboseOutput)
+			if (m_executor.m_bVerboseOutput)
 			{
 				apfile[1] = stdout;
 				numOutputs++;

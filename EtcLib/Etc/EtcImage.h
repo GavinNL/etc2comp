@@ -99,7 +99,7 @@ namespace Etc
 
 		~Image(void);
 private:
-		EncodingStatus Encode(Format a_format, ErrorMetric a_errormetric, float a_fEffort, 
+		EncodingStatus Encode(Executor& a_executor, Format a_format, ErrorMetric a_errormetric, float a_fEffort, 
 			unsigned int a_uiJobs, unsigned int a_uiMaxJobs);
 public:
 
@@ -187,7 +187,6 @@ public:
 		ColorFloatRGBA m_numColorValues;
 		ColorFloatRGBA m_numOutOfRangeValues;
 
-		bool m_bVerboseOutput;
 	private:
 		//add a warning or error to check for while encoding
 		inline void TrackEncodingWarning(EncodingStatus a_encStatus)

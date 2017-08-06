@@ -30,6 +30,7 @@ Image is an array of 4x4 blocks that represent the encoding of the source image
 #include "Etc.h"
 #include "EtcBlock4x4.h"
 #include "EtcBlock4x4EncodingBits.h"
+#include "EtcExecutor.h"
 #include "EtcSortedBlockList.h"
 
 #if ETC_WINDOWS
@@ -108,8 +109,6 @@ namespace Etc
 		m_iNumOpaquePixels = 0;
 		m_iNumTranslucentPixels = 0;
 		m_iNumTransparentPixels = 0;
-		m_bVerboseOutput = false;
-
 	}
 
 	// ----------------------------------------------------------------------------------------------------
@@ -154,7 +153,6 @@ namespace Etc
 
 		m_errormetric = a_errormetric;
 		m_fEffort = 0.0f;
-		m_bVerboseOutput = false;
 		
 		unsigned char *paucEncodingBits = m_paucEncodingBits;
 		unsigned int uiEncodingBitsBytesPerBlock = Block4x4EncodingBits::GetBytesPerBlock(m_encodingbitsformat);
@@ -256,7 +254,7 @@ namespace Etc
 	// explore a range of possible encodings based on a_fEffort (range = [0:100])
 	// speed up process using a_uiJobs as the number of process threads (a_uiJobs must not excede a_uiMaxJobs)
 	//
-	Image::EncodingStatus Image::Encode(Format a_format, ErrorMetric a_errormetric, float a_fEffort, unsigned int a_uiJobs, unsigned int a_uiMaxJobs)
+	Image::EncodingStatus Image::Encode(Executor& a_executor, Format a_format, ErrorMetric a_errormetric, float a_fEffort, unsigned int a_uiJobs, unsigned int a_uiMaxJobs)
 	{
 		auto encodingStatus = InitEncode(a_format, a_errormetric, a_fEffort);
 
@@ -292,14 +290,14 @@ namespace Etc
 			unsigned int uiFinishedBlocks = 0;
 			unsigned int uiTotalEffortBlocks = static_cast<unsigned int>(roundf(0.01f * m_fEffort  * GetNumberOfBlocks()));
 
-			if (m_bVerboseOutput)
+			if (a_executor.m_bVerboseOutput)
 			{
 				printf("effortblocks = %d\n", uiTotalEffortBlocks);
 			}
 			unsigned int uiPass = 0;
 			while (1)
 			{
-				if (m_bVerboseOutput)
+				if (a_executor.m_bVerboseOutput)
 				{
 					uiPass++;
 					printf("pass %u\n", uiPass);
@@ -307,7 +305,7 @@ namespace Etc
 				m_psortedblocklist->Sort();
 				uiUnfinishedBlocks = m_psortedblocklist->GetNumberOfSortedBlocks();
 				uiFinishedBlocks = GetNumberOfBlocks() - uiUnfinishedBlocks;
-				if (m_bVerboseOutput)
+				if (a_executor.m_bVerboseOutput)
 				{
 					printf("    %u unfinished blocks\n", uiUnfinishedBlocks);
 					// m_psortedblocklist->Print();
@@ -318,7 +316,7 @@ namespace Etc
 				//stop enocding when we did enough to satify the effort percentage
 				if (uiFinishedBlocks >= uiTotalEffortBlocks)
 				{
-					if (m_bVerboseOutput)
+					if (a_executor.m_bVerboseOutput)
 					{
 						printf("Finished %d Blocks out of %d\n", uiFinishedBlocks, uiTotalEffortBlocks);
 					}
@@ -354,7 +352,7 @@ namespace Etc
 					delete[] handleToBlockEncoders;
 				}
 
-				if (m_bVerboseOutput)
+				if (a_executor.m_bVerboseOutput)
 				{
 					printf("    %u iterated blocks\n", uiIteratedBlocks);
 				}
