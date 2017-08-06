@@ -193,14 +193,7 @@ namespace Etc
 		}*/
 	}
 
-	// ----------------------------------------------------------------------------------------------------
-	// encode an image
-	// create a set of encoding bits that conforms to a_format
-	// find best fit using a_errormetric
-	// explore a range of possible encodings based on a_fEffort (range = [0:100])
-	// speed up process using a_uiJobs as the number of process threads (a_uiJobs must not excede a_uiMaxJobs)
-	//
-	Image::EncodingStatus Image::Encode(Format a_format, ErrorMetric a_errormetric, float a_fEffort, unsigned int a_uiJobs, unsigned int a_uiMaxJobs)
+	Image::EncodingStatus Image::InitEncode(Format const a_format, ErrorMetric const a_errormetric, float const a_fEffort)
 	{
 		m_encodingStatus = EncodingStatus::SUCCESS;
 
@@ -224,16 +217,6 @@ namespace Etc
 			AddToEncodingStatus(WARNING_EFFORT_OUT_OF_RANGE);
 			m_fEffort = ETCCOMP_MAX_EFFORT_LEVEL;
 		}
-		if (a_uiJobs < 1)
-		{
-			a_uiJobs = 1;
-			AddToEncodingStatus(WARNING_JOBS_OUT_OF_RANGE);
-		}
-		else if (a_uiJobs > a_uiMaxJobs)
-		{
-			a_uiJobs = a_uiMaxJobs;
-			AddToEncodingStatus(WARNING_JOBS_OUT_OF_RANGE);
-		}
 
 		m_encodingbitsformat = DetermineEncodingBitsFormat(m_format);
 
@@ -248,7 +231,41 @@ namespace Etc
 		m_paucEncodingBits = new unsigned char[m_uiEncodingBitsBytes];
 
 		InitBlocksAndBlockSorter();
+		return m_encodingStatus;
+	}
 
+	unsigned int Image::CalculateJobs(unsigned int a_uiJobs, unsigned int const a_uiMaxJobs) {
+		if (a_uiJobs < 1)
+		{
+			a_uiJobs = 1;
+			AddToEncodingStatus(WARNING_JOBS_OUT_OF_RANGE);
+		}
+		else if (a_uiJobs > a_uiMaxJobs)
+		{
+			a_uiJobs = a_uiMaxJobs;
+			AddToEncodingStatus(WARNING_JOBS_OUT_OF_RANGE);
+		}
+
+		return a_uiJobs;
+	}
+
+	// ----------------------------------------------------------------------------------------------------
+	// encode an image
+	// create a set of encoding bits that conforms to a_format
+	// find best fit using a_errormetric
+	// explore a range of possible encodings based on a_fEffort (range = [0:100])
+	// speed up process using a_uiJobs as the number of process threads (a_uiJobs must not excede a_uiMaxJobs)
+	//
+	Image::EncodingStatus Image::Encode(Format a_format, ErrorMetric a_errormetric, float a_fEffort, unsigned int a_uiJobs, unsigned int a_uiMaxJobs)
+	{
+		auto encodingStatus = InitEncode(a_format, a_errormetric, a_fEffort);
+
+		if (IsError(encodingStatus))
+		{
+			return m_encodingStatus;
+		}
+
+		a_uiJobs = CalculateJobs(a_uiJobs, a_uiMaxJobs);
 
 		std::future<void> *handle = new std::future<void>[a_uiMaxJobs];
 

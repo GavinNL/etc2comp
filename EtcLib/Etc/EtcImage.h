@@ -220,6 +220,10 @@ public:
 												unsigned int a_uiMultithreadingOffset,
 												unsigned int a_uiMultithreadingStride);
 
+		EncodingStatus InitEncode(Format a_format, ErrorMetric a_errormetric, float a_fEffort);
+
+		unsigned int CalculateJobs(unsigned int a_uiJobs, unsigned int a_uiMaxJobs);
+
 		// inputs
 		ColorFloatRGBA *m_pafrgbaSource;
 		unsigned int m_uiSourceWidth;
