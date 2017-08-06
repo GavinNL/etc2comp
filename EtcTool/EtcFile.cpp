@@ -174,14 +174,14 @@ File::File(const char *a_pstrFilename, Format a_fileformat)
 	size_t szResult;
 
 	m_pheader = new FileHeader_Ktx(this);
-	szResult = fread( ((FileHeader_Ktx*)m_pheader)->GetData(), 1, sizeof(FileHeader_Ktx::Data), pfile);
+	szResult = fread(static_cast<FileHeader_Ktx*>(m_pheader)->GetData(), 1, sizeof(FileHeader_Ktx::Data), pfile);
 	assert(szResult > 0);
 
 	m_uiNumMipmaps = 1;
 	m_pMipmapImages = new RawImage[m_uiNumMipmaps];
 
-	if (((FileHeader_Ktx*)m_pheader)->GetData()->m_u32BytesOfKeyValueData > 0)
-		fseek(pfile, ((FileHeader_Ktx*)m_pheader)->GetData()->m_u32BytesOfKeyValueData, SEEK_CUR);
+	if (static_cast<FileHeader_Ktx*>(m_pheader)->GetData()->m_u32BytesOfKeyValueData > 0)
+		fseek(pfile, static_cast<FileHeader_Ktx*>(m_pheader)->GetData()->m_u32BytesOfKeyValueData, SEEK_CUR);
 	szResult = fread(&m_pMipmapImages->uiEncodingBitsBytes, 1, sizeof(unsigned int), pfile);
 	assert(szResult > 0);
 
@@ -190,8 +190,8 @@ File::File(const char *a_pstrFilename, Format a_fileformat)
 	szResult = fread(m_pMipmapImages->paucEncodingBits.get(), 1, m_pMipmapImages->uiEncodingBitsBytes, pfile);
 	assert(szResult == m_pMipmapImages->uiEncodingBitsBytes);
 
-	uint32_t uiInternalFormat = ((FileHeader_Ktx*)m_pheader)->GetData()->m_u32GlInternalFormat;
-	uint32_t uiBaseInternalFormat = ((FileHeader_Ktx*)m_pheader)->GetData()->m_u32GlBaseInternalFormat;
+	uint32_t uiInternalFormat = static_cast<FileHeader_Ktx*>(m_pheader)->GetData()->m_u32GlInternalFormat;
+	uint32_t uiBaseInternalFormat = static_cast<FileHeader_Ktx*>(m_pheader)->GetData()->m_u32GlBaseInternalFormat;
 	
 	if (uiInternalFormat == (uint32_t)FileHeader_Ktx::InternalFormat::ETC1_RGB8 && uiBaseInternalFormat == (uint32_t)FileHeader_Ktx::BaseInternalFormat::ETC1_RGB8)
 	{
@@ -230,8 +230,8 @@ File::File(const char *a_pstrFilename, Format a_fileformat)
 		m_imageformat = Image::Format::UNKNOWN;
 	}
 
-	m_uiSourceWidth = ((FileHeader_Ktx*)m_pheader)->GetData()->m_u32PixelWidth;
-	m_uiSourceHeight = ((FileHeader_Ktx*)m_pheader)->GetData()->m_u32PixelHeight;
+	m_uiSourceWidth = static_cast<FileHeader_Ktx*>(m_pheader)->GetData()->m_u32PixelWidth;
+	m_uiSourceHeight = static_cast<FileHeader_Ktx*>(m_pheader)->GetData()->m_u32PixelHeight;
 	m_pMipmapImages->uiExtendedWidth = Image::CalcExtendedDimension((unsigned short)m_uiSourceWidth);
 	m_pMipmapImages->uiExtendedHeight = Image::CalcExtendedDimension((unsigned short)m_uiSourceHeight);
 
