@@ -22,12 +22,12 @@
 #include "EtcErrorMetric.h"
 #include <memory>
 
-#define ETCCOMP_MIN_EFFORT_LEVEL (0.0f)
-#define ETCCOMP_DEFAULT_EFFORT_LEVEL (40.0f)
-#define ETCCOMP_MAX_EFFORT_LEVEL (100.0f)
-
 namespace Etc
 {
+	constexpr float ETCCOMP_MIN_EFFORT_LEVEL = 0.0f;
+	constexpr float ETCCOMP_DEFAULT_EFFORT_LEVEL = 40.0f;
+	constexpr float ETCCOMP_MAX_EFFORT_LEVEL = 100.0f;
+
 	class Block4x4EncodingBits;
 
 	struct RawImage
