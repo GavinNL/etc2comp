@@ -93,7 +93,7 @@ namespace Etc
 		// constructor using encoding bits
 		Image(Format a_format, 
 				unsigned int a_uiSourceWidth, unsigned int a_uiSourceHeight,
-				unsigned char *a_paucEncidingBits, unsigned int a_uiEncodingBitsBytes,
+				unsigned char *a_paucEncodingBits, unsigned int a_uiEncodingBitsBytes,
 				Image *a_pimageSource,
 				ErrorMetric a_errormetric);
 
