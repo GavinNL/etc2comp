@@ -104,7 +104,6 @@ namespace Etc
 		m_paucEncodingBits = nullptr;
 
 		m_errormetric = a_errormetric;
-		m_fEffort = 0.0f;
 
 		m_iNumOpaquePixels = 0;
 		m_iNumTranslucentPixels = 0;
@@ -152,7 +151,6 @@ namespace Etc
 		m_paucEncodingBits = a_paucEncidingBits;
 
 		m_errormetric = a_errormetric;
-		m_fEffort = 0.0f;
 		
 		unsigned char *paucEncodingBits = m_paucEncodingBits;
 		unsigned int uiEncodingBitsBytesPerBlock = Block4x4EncodingBits::GetBytesPerBlock(m_encodingbitsformat);
@@ -191,13 +189,13 @@ namespace Etc
 		}*/
 	}
 
-	Image::EncodingStatus Image::InitEncode(Format const a_format, ErrorMetric const a_errormetric, float const a_fEffort)
+	Image::EncodingStatus Image::InitEncode(Executor& a_executor, Format const a_format, ErrorMetric const a_errormetric, float const a_fEffort)
 	{
 		m_encodingStatus = EncodingStatus::SUCCESS;
 
 		m_format = a_format;
 		m_errormetric = a_errormetric;
-		m_fEffort = a_fEffort;
+		a_executor.m_fEffort = a_fEffort;
 
 		if (m_errormetric < 0 || m_errormetric > ERROR_METRICS)
 		{
@@ -205,15 +203,15 @@ namespace Etc
 			return m_encodingStatus;
 		}
 
-		if (m_fEffort < ETCCOMP_MIN_EFFORT_LEVEL)
+		if (a_executor.m_fEffort < ETCCOMP_MIN_EFFORT_LEVEL)
 		{
 			AddToEncodingStatus(WARNING_EFFORT_OUT_OF_RANGE);
-			m_fEffort = ETCCOMP_MIN_EFFORT_LEVEL;
+			a_executor.m_fEffort = ETCCOMP_MIN_EFFORT_LEVEL;
 		}
-		else if (m_fEffort > ETCCOMP_MAX_EFFORT_LEVEL)
+		else if (a_executor.m_fEffort > ETCCOMP_MAX_EFFORT_LEVEL)
 		{
 			AddToEncodingStatus(WARNING_EFFORT_OUT_OF_RANGE);
-			m_fEffort = ETCCOMP_MAX_EFFORT_LEVEL;
+			a_executor.m_fEffort = ETCCOMP_MAX_EFFORT_LEVEL;
 		}
 
 		m_encodingbitsformat = DetermineEncodingBitsFormat(m_format);
@@ -256,7 +254,7 @@ namespace Etc
 	//
 	Image::EncodingStatus Image::Encode(Executor& a_executor, Format a_format, ErrorMetric a_errormetric, float a_fEffort, unsigned int a_uiJobs, unsigned int a_uiMaxJobs)
 	{
-		auto encodingStatus = InitEncode(a_format, a_errormetric, a_fEffort);
+		auto encodingStatus = InitEncode(a_executor, a_format, a_errormetric, a_fEffort);
 
 		if (IsError(encodingStatus))
 		{
@@ -274,10 +272,10 @@ namespace Etc
 			
 		for (int i = 0; i < (int)uiNumThreadsNeeded - 1; i++)
 		{
-			handle[i] = async(std::launch::async, &Image::RunFirstPass, this, i, uiNumThreadsNeeded);
+			handle[i] = async(std::launch::async, &Image::RunFirstPass, this, a_executor.m_fEffort, i, uiNumThreadsNeeded);
 		}
 
-		RunFirstPass(uiNumThreadsNeeded - 1, uiNumThreadsNeeded);
+		RunFirstPass(a_executor.m_fEffort, uiNumThreadsNeeded - 1, uiNumThreadsNeeded);
 
 		for (int i = 0; i < (int)uiNumThreadsNeeded - 1; i++)
 		{
@@ -285,10 +283,10 @@ namespace Etc
 		}
 
 		// perform effort-based encoding
-		if (m_fEffort > ETCCOMP_MIN_EFFORT_LEVEL)
+		if (a_executor.m_fEffort > ETCCOMP_MIN_EFFORT_LEVEL)
 		{
 			unsigned int uiFinishedBlocks = 0;
-			unsigned int uiTotalEffortBlocks = static_cast<unsigned int>(roundf(0.01f * m_fEffort  * GetNumberOfBlocks()));
+			unsigned int uiTotalEffortBlocks = static_cast<unsigned int>(roundf(0.01f * a_executor.m_fEffort  * GetNumberOfBlocks()));
 
 			if (a_executor.m_bVerboseOutput)
 			{
@@ -331,7 +329,7 @@ namespace Etc
 				{
 					//since we already how many blocks each thread will process
 					//cap the thread limit to do the proper amount of work, and not more
-					uiIteratedBlocks = IterateThroughWorstBlocks(blocksToIterateThisPass, 0, 1);
+					uiIteratedBlocks = IterateThroughWorstBlocks(a_executor.m_fEffort, blocksToIterateThisPass, 0, 1);
 				}
 				else
 				{
@@ -340,9 +338,9 @@ namespace Etc
 
 					for (int i = 0; i < (int)uiNumThreadsNeeded - 1; i++)
 					{
-						handleToBlockEncoders[i] = async(std::launch::async, &Image::IterateThroughWorstBlocks, this, blocksToIterateThisPass, i, uiNumThreadsNeeded);
+						handleToBlockEncoders[i] = async(std::launch::async, &Image::IterateThroughWorstBlocks, this, a_executor.m_fEffort, blocksToIterateThisPass, i, uiNumThreadsNeeded);
 					}
-					uiIteratedBlocks = IterateThroughWorstBlocks(blocksToIterateThisPass, uiNumThreadsNeeded - 1, uiNumThreadsNeeded);
+					uiIteratedBlocks = IterateThroughWorstBlocks(a_executor.m_fEffort, blocksToIterateThisPass, uiNumThreadsNeeded - 1, uiNumThreadsNeeded);
 
 					for (int i = 0; i < (int)uiNumThreadsNeeded - 1; i++)
 					{
@@ -381,7 +379,8 @@ namespace Etc
 	// stop when a_uiMaxBlocks blocks have been iterated
 	// split the blocks between the process threads using a_uiMultithreadingOffset and a_uiMultithreadingStride
 	//
-	unsigned int Image::IterateThroughWorstBlocks(unsigned int a_uiMaxBlocks, 
+	unsigned int Image::IterateThroughWorstBlocks(float const a_fEffort,
+													unsigned int a_uiMaxBlocks,
 													unsigned int a_uiMultithreadingOffset, 
 													unsigned int a_uiMultithreadingStride)
 	{
@@ -398,7 +397,7 @@ namespace Etc
 				break;
 			}
 
-			plink->GetBlock()->PerformEncodingIteration(m_format, m_errormetric, m_fEffort);
+			plink->GetBlock()->PerformEncodingIteration(m_format, m_errormetric, a_fEffort);
 
 			uiIteratedBlocks += a_uiMultithreadingStride;	
 		}
@@ -591,7 +590,9 @@ namespace Etc
 	// the encoder generally finds a reasonable, fast encoding
 	// this is run on all blocks regardless of effort to ensure that all blocks have a valid encoding
 	//
-	void Image::RunFirstPass(unsigned int a_uiMultithreadingOffset, unsigned int a_uiMultithreadingStride)
+	void Image::RunFirstPass(float const a_fEffort,
+								unsigned int a_uiMultithreadingOffset,
+								unsigned int a_uiMultithreadingStride)
 	{
 		assert(a_uiMultithreadingStride > 0);
 
@@ -600,7 +601,7 @@ namespace Etc
 				uiBlock += a_uiMultithreadingStride)
 		{
 			Block4x4 *pblock = &m_pablock[uiBlock];
-			pblock->PerformEncodingIteration(m_format, m_errormetric, m_fEffort);
+			pblock->PerformEncodingIteration(m_format, m_errormetric, a_fEffort);
 		}
 	}
 

@@ -209,17 +209,19 @@ public:
 
 		void InitBlocksAndBlockSorter(void);
 
-		void RunFirstPass(unsigned int a_uiMultithreadingOffset, 
+		void RunFirstPass(float a_fEffort,
+							unsigned int a_uiMultithreadingOffset,
 							unsigned int a_uiMultithreadingStride);
 
 		void SetEncodingBits(unsigned int a_uiMultithreadingOffset,
 								unsigned int a_uiMultithreadingStride);
 
-		unsigned int IterateThroughWorstBlocks(unsigned int a_uiMaxBlocks,
+		unsigned int IterateThroughWorstBlocks(float a_fEffort,
+												unsigned int a_uiMaxBlocks,
 												unsigned int a_uiMultithreadingOffset,
 												unsigned int a_uiMultithreadingStride);
 
-		EncodingStatus InitEncode(Format a_format, ErrorMetric a_errormetric, float a_fEffort);
+		EncodingStatus InitEncode(Executor& a_executor, Format a_format, ErrorMetric a_errormetric, float a_fEffort);
 
 		unsigned int CalculateJobs(unsigned int a_uiJobs, unsigned int a_uiMaxJobs);
 
@@ -239,7 +241,6 @@ public:
 		unsigned int m_uiEncodingBitsBytes;		// for entire image
 		unsigned char *m_paucEncodingBits;
 		ErrorMetric m_errormetric;
-		float m_fEffort;
 		
 		SortedBlockList *m_psortedblocklist;
 		//this will hold any warning or errors that happen during encoding

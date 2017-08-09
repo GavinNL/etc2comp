@@ -26,8 +26,11 @@ namespace Etc {
 		// stats
 		Milliseconds m_msEncodeTime = Milliseconds::zero();
 		Image& m_image;
+		float m_fEffort = 0.0f;
 	public:
 		bool m_bVerboseOutput = false;
+
+		friend class Image;
 	};
 
 } // namespace Etc
