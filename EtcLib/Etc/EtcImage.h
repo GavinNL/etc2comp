@@ -165,8 +165,6 @@ public:
 			return m_format;
 		}
 
-		static Block4x4EncodingBits::Format DetermineEncodingBitsFormat(Format a_format);
-
 		inline static unsigned short CalcExtendedDimension(unsigned short a_ushOriginalDimension)
 		{
 			return (unsigned short)((a_ushOriginalDimension + 3) & ~3);
@@ -316,5 +314,39 @@ public:
 		}
 #undef TrackEncodingWarning
 		return warnings;
+	}
+
+	// determine the encoding bits format based on the encoding format
+	// the encoding bits format is a family of bit encodings that are shared across various encoding formats
+	//
+	constexpr Block4x4EncodingBits::Format DetermineEncodingBitsFormat(Image::Format const a_format)
+	{
+		// determine encoding bits format from image format
+		switch (a_format)
+		{
+		case Image::Format::ETC1:
+		case Image::Format::RGB8:
+		case Image::Format::SRGB8:
+			return Block4x4EncodingBits::Format::RGB8;
+
+		case Image::Format::RGBA8:
+		case Image::Format::SRGBA8:
+			return Block4x4EncodingBits::Format::RGBA8;
+
+		case Image::Format::R11:
+		case Image::Format::SIGNED_R11:
+			return Block4x4EncodingBits::Format::R11;
+
+		case Image::Format::RG11:
+		case Image::Format::SIGNED_RG11:
+			return Block4x4EncodingBits::Format::RG11;
+
+		case Image::Format::RGB8A1:
+		case Image::Format::SRGB8A1:
+			return Block4x4EncodingBits::Format::RGB8A1;
+
+		default:
+			return Block4x4EncodingBits::Format::UNKNOWN;
+		}
 	}
 } // namespace Etc

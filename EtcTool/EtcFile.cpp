@@ -236,7 +236,7 @@ File::File(const char *a_pstrFilename, Format a_fileformat)
 	m_pMipmapImages->uiExtendedHeight = Image::CalcExtendedDimension((unsigned short)m_uiSourceHeight);
 
 	unsigned int uiBlocks = m_pMipmapImages->uiExtendedWidth * m_pMipmapImages->uiExtendedHeight / 16;
-	Block4x4EncodingBits::Format encodingbitsformat = Image::DetermineEncodingBitsFormat(m_imageformat);
+	Block4x4EncodingBits::Format encodingbitsformat = DetermineEncodingBitsFormat(m_imageformat);
 	unsigned int expectedbytes = uiBlocks * Block4x4EncodingBits::GetBytesPerBlock(encodingbitsformat);
 	assert(expectedbytes == m_pMipmapImages->uiEncodingBitsBytes);
 
@@ -301,7 +301,7 @@ void File::UseSingleBlock(int a_iPixelX, int a_iPixelY)
 	m_uiSourceWidth = 4;
 	m_uiSourceHeight = 4;
 
-	Block4x4EncodingBits::Format encodingbitsformat = Image::DetermineEncodingBitsFormat(m_imageformat);
+	Block4x4EncodingBits::Format encodingbitsformat = DetermineEncodingBitsFormat(m_imageformat);
 	unsigned int uiEncodingBitsBytesPerBlock = Block4x4EncodingBits::GetBytesPerBlock(encodingbitsformat);
 
 	int numMipmaps = 1;

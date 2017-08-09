@@ -601,51 +601,6 @@ namespace Etc
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// determine the encoding bits format based on the encoding format
-	// the encoding bits format is a family of bit encodings that are shared across various encoding formats
-	//
-	Block4x4EncodingBits::Format Image::DetermineEncodingBitsFormat(Format a_format)
-	{
-		Block4x4EncodingBits::Format encodingbitsformat;
-
-		// determine encoding bits format from image format
-		switch (a_format)
-		{
-		case Format::ETC1:
-		case Format::RGB8:
-		case Format::SRGB8:
-			encodingbitsformat = Block4x4EncodingBits::Format::RGB8;
-			break;
-
-		case Format::RGBA8:
-		case Format::SRGBA8:
-			encodingbitsformat = Block4x4EncodingBits::Format::RGBA8;
-			break;
-
-		case Format::R11:
-		case Format::SIGNED_R11:
-			encodingbitsformat = Block4x4EncodingBits::Format::R11;
-			break;
-
-		case Format::RG11:
-		case Format::SIGNED_RG11:
-			encodingbitsformat = Block4x4EncodingBits::Format::RG11;
-			break;
-
-		case Format::RGB8A1:
-		case Format::SRGB8A1:
-			encodingbitsformat = Block4x4EncodingBits::Format::RGB8A1;
-			break;
-
-		default:
-			encodingbitsformat = Block4x4EncodingBits::Format::UNKNOWN;
-			break;
-		}
-
-		return encodingbitsformat;
-	}
-
-	// ----------------------------------------------------------------------------------------------------
 	//
 
 }	// namespace Etc
