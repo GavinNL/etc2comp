@@ -418,40 +418,52 @@ namespace Etc
 	//
 	void Image::FindAndSetEncodingWarnings()
 	{
+		auto const warning = FindEncodingWarning();
+		if (warning == EncodingStatus::SUCCESS)
+		{
+			return;
+		}
+
+		AddToEncodingStatusIfSignfigant(warning);
+	}
+
+	Image::EncodingStatus Image::FindEncodingWarning() const {
 		int numPixels = (m_uiBlockRows * 4) * (m_uiBlockColumns * 4);
+		EncodingStatus warnings = EncodingStatus::SUCCESS;
 		if (m_iNumOpaquePixels == numPixels)
 		{
-			AddToEncodingStatusIfSignfigant(Image::EncodingStatus::WARNING_ALL_OPAQUE_PIXELS);
+			warnings |= EncodingStatus::WARNING_ALL_OPAQUE_PIXELS;
 		}
 		if (m_iNumOpaquePixels < numPixels)
 		{
-			AddToEncodingStatusIfSignfigant(Image::EncodingStatus::WARNING_SOME_NON_OPAQUE_PIXELS);
+			warnings |= EncodingStatus::WARNING_SOME_NON_OPAQUE_PIXELS;
 		}
 		if (m_iNumTranslucentPixels > 0)
 		{
-			AddToEncodingStatusIfSignfigant(Image::EncodingStatus::WARNING_SOME_TRANSLUCENT_PIXELS);
+			warnings |= EncodingStatus::WARNING_SOME_TRANSLUCENT_PIXELS;
 		}
 		if (m_iNumTransparentPixels == numPixels)
 		{
-			AddToEncodingStatusIfSignfigant(Image::EncodingStatus::WARNING_ALL_TRANSPARENT_PIXELS);
+			warnings |= EncodingStatus::WARNING_ALL_TRANSPARENT_PIXELS;
 		}
 		if (m_numColorValues.fB > 0.0f)
 		{
-			AddToEncodingStatusIfSignfigant(Image::EncodingStatus::WARNING_SOME_BLUE_VALUES_ARE_NOT_ZERO);
+			warnings |= EncodingStatus::WARNING_SOME_BLUE_VALUES_ARE_NOT_ZERO;
 		}
 		if (m_numColorValues.fG > 0.0f) 
 		{
-			AddToEncodingStatusIfSignfigant(Image::EncodingStatus::WARNING_SOME_GREEN_VALUES_ARE_NOT_ZERO);
+			warnings |= EncodingStatus::WARNING_SOME_GREEN_VALUES_ARE_NOT_ZERO;
 		}
 
 		if (m_numOutOfRangeValues.fR > 0.0f || m_numOutOfRangeValues.fG > 0.0f)
 		{
-			AddToEncodingStatusIfSignfigant(Image::EncodingStatus::WARNING_SOME_RGBA_NOT_0_TO_1);
+			warnings |= EncodingStatus::WARNING_SOME_RGBA_NOT_0_TO_1;
 		}
 		if (m_numOutOfRangeValues.fB > 0.0f || m_numOutOfRangeValues.fA > 0.0f)
 		{
-			AddToEncodingStatusIfSignfigant(Image::EncodingStatus::WARNING_SOME_RGBA_NOT_0_TO_1);
+			warnings |= EncodingStatus::WARNING_SOME_RGBA_NOT_0_TO_1;
 		}
+		return warnings;
 	}
 	
 	// ----------------------------------------------------------------------------------------------------

@@ -204,6 +204,7 @@ public:
 		Image(void);
 		void FindEncodingWarningTypesForCurFormat();
 		void FindAndSetEncodingWarnings();
+		EncodingStatus FindEncodingWarning() const;
 
 		void InitBlocksAndBlockSorter(void);
 
