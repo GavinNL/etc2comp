@@ -269,4 +269,52 @@ public:
 		return lhs;
 	}
 
+	constexpr Image::EncodingStatus GetEncodingWarningTypes(Image::Format const a_format)
+	{
+#define TrackEncodingWarning(x) warnings |= Image::x
+		Image::EncodingStatus warnings = Image::SUCCESS;
+		TrackEncodingWarning(WARNING_ALL_TRANSPARENT_PIXELS);
+		TrackEncodingWarning(WARNING_SOME_RGBA_NOT_0_TO_1);
+		switch (a_format)
+		{
+		case Image::Format::ETC1:
+		case Image::Format::RGB8:
+		case Image::Format::SRGB8:
+			TrackEncodingWarning(WARNING_SOME_NON_OPAQUE_PIXELS);
+			TrackEncodingWarning(WARNING_SOME_TRANSLUCENT_PIXELS);
+			break;
+
+		case Image::Format::RGB8A1:
+		case Image::Format::SRGB8A1:
+			TrackEncodingWarning(WARNING_SOME_TRANSLUCENT_PIXELS);
+			TrackEncodingWarning(WARNING_ALL_OPAQUE_PIXELS);
+			break;
+		case Image::Format::RGBA8:
+		case Image::Format::SRGBA8:
+			TrackEncodingWarning(WARNING_ALL_OPAQUE_PIXELS);
+			break;
+
+		case Image::Format::R11:
+		case Image::Format::SIGNED_R11:
+			TrackEncodingWarning(WARNING_SOME_NON_OPAQUE_PIXELS);
+			TrackEncodingWarning(WARNING_SOME_TRANSLUCENT_PIXELS);
+			TrackEncodingWarning(WARNING_SOME_GREEN_VALUES_ARE_NOT_ZERO);
+			TrackEncodingWarning(WARNING_SOME_BLUE_VALUES_ARE_NOT_ZERO);
+			break;
+
+		case Image::Format::RG11:
+		case Image::Format::SIGNED_RG11:
+			TrackEncodingWarning(WARNING_SOME_NON_OPAQUE_PIXELS);
+			TrackEncodingWarning(WARNING_SOME_TRANSLUCENT_PIXELS);
+			TrackEncodingWarning(WARNING_SOME_BLUE_VALUES_ARE_NOT_ZERO);
+			break;
+		case Image::Format::FORMATS:
+		case Image::Format::UNKNOWN:
+		default:
+			assert(0);
+			break;
+		}
+#undef TrackEncodingWarning
+		return warnings;
+	}
 } // namespace Etc
