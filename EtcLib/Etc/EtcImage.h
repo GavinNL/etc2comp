@@ -16,10 +16,6 @@
 
 #pragma once
 
-#include <cstdint>
-
-#include <chrono>
-
 //#include "Etc.h"
 #include "EtcColorFloatRGBA.h"
 #include "EtcBlock4x4EncodingBits.h"
@@ -30,37 +26,11 @@ namespace Etc
 {
 	class Block4x4;
 	class EncoderSpec;
-	class Executor;
 	class SortedBlockList;
 
     class Image
     {
     public:
-
-		//the differnt warning and errors that can come up during encoding
-		enum EncodingStatus : std::uint32_t
-		{
-			SUCCESS = 0,
-			//
-			WARNING_THRESHOLD = 1 << 0,
-			//
-			WARNING_EFFORT_OUT_OF_RANGE = 1 << 1,
-			WARNING_JOBS_OUT_OF_RANGE = 1 << 2,
-			WARNING_SOME_NON_OPAQUE_PIXELS = 1 << 3,//just for opaque formats, etc1, rgb8, r11, rg11
-			WARNING_ALL_OPAQUE_PIXELS = 1 << 4,
-			WARNING_ALL_TRANSPARENT_PIXELS = 1 << 5,
-			WARNING_SOME_TRANSLUCENT_PIXELS = 1 << 6,//just for rgb8A1
-			WARNING_SOME_RGBA_NOT_0_TO_1 = 1 << 7,
-			WARNING_SOME_BLUE_VALUES_ARE_NOT_ZERO = 1 << 8,
-			WARNING_SOME_GREEN_VALUES_ARE_NOT_ZERO = 1 << 9,
-			//
-			ERROR_THRESHOLD = 1 << 16,
-			//
-			ERROR_UNKNOWN_FORMAT = 1 << 17,
-			ERROR_UNKNOWN_ERROR_METRIC = 1 << 18,
-			ERROR_ZERO_WIDTH_OR_HEIGHT = 1 << 19,
-			//
-		};
 		
 		enum class Format
 		{
@@ -94,19 +64,12 @@ namespace Etc
 		Image(Format a_format, 
 				unsigned int a_uiSourceWidth, unsigned int a_uiSourceHeight,
 				unsigned char *a_paucEncodingBits, unsigned int a_uiEncodingBitsBytes,
+				Block4x4EncodingBits::Format a_encodingbitsformat,
 				Image *a_pimageSource,
 				ErrorMetric a_errormetric);
 
 		~Image(void);
-private:
-		EncodingStatus Encode(Executor& a_executor, Format a_format, ErrorMetric a_errormetric, float a_fEffort, 
-			unsigned int a_uiJobs, unsigned int a_uiMaxJobs);
 public:
-
-		inline void AddToEncodingStatus(EncodingStatus a_encStatus)
-		{
-			m_encodingStatus = (EncodingStatus)((unsigned int)m_encodingStatus | (unsigned int)a_encStatus);
-		}
 		
 		inline unsigned int GetSourceWidth(void)
 		{
@@ -138,15 +101,6 @@ public:
 			return m_pablock;
 		}
 
-		inline unsigned char * GetEncodingBits(void)
-		{
-			return m_paucEncodingBits;
-		}
-
-		inline unsigned int GetEncodingBitsBytes(void)
-		{
-			return m_uiEncodingBitsBytes;
-		}
 
 		float GetError(void);
 
@@ -186,43 +140,9 @@ public:
 		ColorFloatRGBA m_numOutOfRangeValues;
 
 	private:
-		//add a warning or error to check for while encoding
-		inline void TrackEncodingWarning(EncodingStatus a_encStatus)
-		{
-			m_warningsToCapture = (EncodingStatus)((unsigned int)m_warningsToCapture | (unsigned int)a_encStatus);
-		}
-
-		//report the warning if it is something we care about for this encoding
-		inline void AddToEncodingStatusIfSignfigant(EncodingStatus a_encStatus)
-		{
-			if ((EncodingStatus)((unsigned int)m_warningsToCapture & (unsigned int)a_encStatus) == a_encStatus)
-			{
-				AddToEncodingStatus(a_encStatus);
-			}
-		}
 
 		Image(void);
-		void FindEncodingWarningTypesForCurFormat();
-		void FindAndSetEncodingWarnings();
-		EncodingStatus FindEncodingWarning() const;
 
-		void InitBlocksAndBlockSorter(void);
-
-		void RunFirstPass(float a_fEffort,
-							unsigned int a_uiMultithreadingOffset,
-							unsigned int a_uiMultithreadingStride);
-
-		void SetEncodingBits(unsigned int a_uiMultithreadingOffset,
-								unsigned int a_uiMultithreadingStride);
-
-		unsigned int IterateThroughWorstBlocks(float a_fEffort,
-												unsigned int a_uiMaxBlocks,
-												unsigned int a_uiMultithreadingOffset,
-												unsigned int a_uiMultithreadingStride);
-
-		EncodingStatus InitEncode(Executor& a_executor, Format a_format, ErrorMetric a_errormetric, float a_fEffort);
-
-		unsigned int CalculateJobs(unsigned int a_uiJobs, unsigned int a_uiMaxJobs);
 
 		// inputs
 		ColorFloatRGBA *m_pafrgbaSource;
@@ -236,118 +156,9 @@ public:
 		Block4x4 *m_pablock;
 		// encoding
 		Format m_format;
-		Block4x4EncodingBits::Format m_encodingbitsformat;
-		unsigned int m_uiEncodingBitsBytes;		// for entire image
-		unsigned char *m_paucEncodingBits;
 		ErrorMetric m_errormetric;
-		
-		SortedBlockList *m_psortedblocklist;
-		//this will hold any warning or errors that happen during encoding
-		EncodingStatus m_encodingStatus;
-		//these will be the warnings we are tracking
-		EncodingStatus m_warningsToCapture;
+
 		friend class Executor;
 	};
 
-	constexpr bool IsError(Image::EncodingStatus const status)
-	{
-		return ((status & Image::ERROR_THRESHOLD) - 1) >= (Image::ERROR_THRESHOLD - 1);
-	}
-
-	constexpr Image::EncodingStatus operator|(Image::EncodingStatus const lhs, Image::EncodingStatus const rhs)
-	{
-		return static_cast<Image::EncodingStatus>(
-			std::underlying_type_t<Image::EncodingStatus>(lhs)
-			| std::underlying_type_t<Image::EncodingStatus>(rhs)
-		);
-	}
-
-	constexpr Image::EncodingStatus& operator|=(Image::EncodingStatus& lhs, Image::EncodingStatus const rhs)
-	{
-		lhs = lhs | rhs;
-		return lhs;
-	}
-
-	constexpr Image::EncodingStatus GetEncodingWarningTypes(Image::Format const a_format)
-	{
-#define TrackEncodingWarning(x) warnings |= Image::x
-		Image::EncodingStatus warnings = Image::SUCCESS;
-		TrackEncodingWarning(WARNING_ALL_TRANSPARENT_PIXELS);
-		TrackEncodingWarning(WARNING_SOME_RGBA_NOT_0_TO_1);
-		switch (a_format)
-		{
-		case Image::Format::ETC1:
-		case Image::Format::RGB8:
-		case Image::Format::SRGB8:
-			TrackEncodingWarning(WARNING_SOME_NON_OPAQUE_PIXELS);
-			TrackEncodingWarning(WARNING_SOME_TRANSLUCENT_PIXELS);
-			break;
-
-		case Image::Format::RGB8A1:
-		case Image::Format::SRGB8A1:
-			TrackEncodingWarning(WARNING_SOME_TRANSLUCENT_PIXELS);
-			TrackEncodingWarning(WARNING_ALL_OPAQUE_PIXELS);
-			break;
-		case Image::Format::RGBA8:
-		case Image::Format::SRGBA8:
-			TrackEncodingWarning(WARNING_ALL_OPAQUE_PIXELS);
-			break;
-
-		case Image::Format::R11:
-		case Image::Format::SIGNED_R11:
-			TrackEncodingWarning(WARNING_SOME_NON_OPAQUE_PIXELS);
-			TrackEncodingWarning(WARNING_SOME_TRANSLUCENT_PIXELS);
-			TrackEncodingWarning(WARNING_SOME_GREEN_VALUES_ARE_NOT_ZERO);
-			TrackEncodingWarning(WARNING_SOME_BLUE_VALUES_ARE_NOT_ZERO);
-			break;
-
-		case Image::Format::RG11:
-		case Image::Format::SIGNED_RG11:
-			TrackEncodingWarning(WARNING_SOME_NON_OPAQUE_PIXELS);
-			TrackEncodingWarning(WARNING_SOME_TRANSLUCENT_PIXELS);
-			TrackEncodingWarning(WARNING_SOME_BLUE_VALUES_ARE_NOT_ZERO);
-			break;
-		case Image::Format::FORMATS:
-		case Image::Format::UNKNOWN:
-		default:
-			assert(0);
-			break;
-		}
-#undef TrackEncodingWarning
-		return warnings;
-	}
-
-	// determine the encoding bits format based on the encoding format
-	// the encoding bits format is a family of bit encodings that are shared across various encoding formats
-	//
-	constexpr Block4x4EncodingBits::Format DetermineEncodingBitsFormat(Image::Format const a_format)
-	{
-		// determine encoding bits format from image format
-		switch (a_format)
-		{
-		case Image::Format::ETC1:
-		case Image::Format::RGB8:
-		case Image::Format::SRGB8:
-			return Block4x4EncodingBits::Format::RGB8;
-
-		case Image::Format::RGBA8:
-		case Image::Format::SRGBA8:
-			return Block4x4EncodingBits::Format::RGBA8;
-
-		case Image::Format::R11:
-		case Image::Format::SIGNED_R11:
-			return Block4x4EncodingBits::Format::R11;
-
-		case Image::Format::RG11:
-		case Image::Format::SIGNED_RG11:
-			return Block4x4EncodingBits::Format::RG11;
-
-		case Image::Format::RGB8A1:
-		case Image::Format::SRGB8A1:
-			return Block4x4EncodingBits::Format::RGB8A1;
-
-		default:
-			return Block4x4EncodingBits::Format::UNKNOWN;
-		}
-	}
 } // namespace Etc

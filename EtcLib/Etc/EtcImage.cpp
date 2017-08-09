@@ -31,14 +31,12 @@ Image is an array of 4x4 blocks that represent the encoding of the source image
 #include "EtcBlock4x4.h"
 #include "EtcBlock4x4EncodingBits.h"
 #include "EtcExecutor.h"
-#include "EtcSortedBlockList.h"
 
 #if ETC_WINDOWS
 #include <windows.h>
 #endif
 #include <ctime>
 #include <chrono>
-#include <future>
 #include <cstdio>
 #include <cstring>
 #include <cassert>
@@ -58,15 +56,9 @@ namespace Etc
 	//
 	Image::Image(void)
 	{
-		m_encodingStatus = EncodingStatus::SUCCESS;
-		m_warningsToCapture = EncodingStatus::SUCCESS;
 		m_pafrgbaSource = nullptr;
 
 		m_pablock = nullptr;
-
-		m_encodingbitsformat = Block4x4EncodingBits::Format::UNKNOWN;
-		m_uiEncodingBitsBytes = 0;
-		m_paucEncodingBits = nullptr;
 
 		m_format = Format::UNKNOWN;
 		m_iNumOpaquePixels = 0;
@@ -82,8 +74,6 @@ namespace Etc
 					unsigned int a_uiSourceHeight, 
 					ErrorMetric a_errormetric)
 	{
-		m_encodingStatus = EncodingStatus::SUCCESS;
-		m_warningsToCapture = EncodingStatus::SUCCESS;
 		m_pafrgbaSource = (ColorFloatRGBA *) a_pafSourceRGBA;
 		m_uiSourceWidth = a_uiSourceWidth;
 		m_uiSourceHeight = a_uiSourceHeight;
@@ -99,10 +89,6 @@ namespace Etc
 
 		m_format = Format::UNKNOWN;
 
-		m_encodingbitsformat = Block4x4EncodingBits::Format::UNKNOWN;
-		m_uiEncodingBitsBytes = 0;
-		m_paucEncodingBits = nullptr;
-
 		m_errormetric = a_errormetric;
 
 		m_iNumOpaquePixels = 0;
@@ -117,9 +103,10 @@ namespace Etc
 	Image::Image(Format a_format,
 					unsigned int a_uiSourceWidth, unsigned int a_uiSourceHeight,
 					unsigned char *a_paucEncidingBits, unsigned int a_uiEncodingBitsBytes,
+					Block4x4EncodingBits::Format const a_encodingbitsformat,
 					Image *a_pimageSource, ErrorMetric a_errormetric)
 	{
-		m_encodingStatus = EncodingStatus::SUCCESS;
+		assert(a_encodingbitsformat != Block4x4EncodingBits::Format::UNKNOWN);
 		m_pafrgbaSource = nullptr;
 		m_uiSourceWidth = a_uiSourceWidth;
 		m_uiSourceHeight = a_uiSourceHeight;
@@ -140,20 +127,10 @@ namespace Etc
 		m_iNumOpaquePixels = 0;
 		m_iNumTranslucentPixels = 0;
 		m_iNumTransparentPixels = 0;
-		
-		m_encodingbitsformat = DetermineEncodingBitsFormat(m_format);
-		if (m_encodingbitsformat == Block4x4EncodingBits::Format::UNKNOWN)
-		{
-			AddToEncodingStatus(ERROR_UNKNOWN_FORMAT);
-			return;
-		}
-		m_uiEncodingBitsBytes = a_uiEncodingBitsBytes;
-		m_paucEncodingBits = a_paucEncidingBits;
-
 		m_errormetric = a_errormetric;
 		
-		unsigned char *paucEncodingBits = m_paucEncodingBits;
-		unsigned int uiEncodingBitsBytesPerBlock = Block4x4EncodingBits::GetBytesPerBlock(m_encodingbitsformat);
+		unsigned char *paucEncodingBits = a_paucEncidingBits;
+		unsigned int uiEncodingBitsBytesPerBlock = Block4x4EncodingBits::GetBytesPerBlock(a_encodingbitsformat);
 
 		unsigned int uiH = 0;
 		unsigned int uiV = 0;
@@ -187,283 +164,6 @@ namespace Etc
 			delete[] m_paucEncodingBits;
 			m_paucEncodingBits = nullptr;
 		}*/
-	}
-
-	Image::EncodingStatus Image::InitEncode(Executor& a_executor, Format const a_format, ErrorMetric const a_errormetric, float const a_fEffort)
-	{
-		m_encodingStatus = EncodingStatus::SUCCESS;
-
-		m_format = a_format;
-		m_errormetric = a_errormetric;
-		a_executor.m_fEffort = a_fEffort;
-
-		if (m_errormetric < 0 || m_errormetric > ERROR_METRICS)
-		{
-			AddToEncodingStatus(ERROR_UNKNOWN_ERROR_METRIC);
-			return m_encodingStatus;
-		}
-
-		if (a_executor.m_fEffort < ETCCOMP_MIN_EFFORT_LEVEL)
-		{
-			AddToEncodingStatus(WARNING_EFFORT_OUT_OF_RANGE);
-			a_executor.m_fEffort = ETCCOMP_MIN_EFFORT_LEVEL;
-		}
-		else if (a_executor.m_fEffort > ETCCOMP_MAX_EFFORT_LEVEL)
-		{
-			AddToEncodingStatus(WARNING_EFFORT_OUT_OF_RANGE);
-			a_executor.m_fEffort = ETCCOMP_MAX_EFFORT_LEVEL;
-		}
-
-		m_encodingbitsformat = DetermineEncodingBitsFormat(m_format);
-
-		if (m_encodingbitsformat == Block4x4EncodingBits::Format::UNKNOWN)
-		{
-			AddToEncodingStatus(ERROR_UNKNOWN_FORMAT);
-			return m_encodingStatus;
-		}
-
-		assert(m_paucEncodingBits == nullptr);
-		m_uiEncodingBitsBytes = GetNumberOfBlocks() * Block4x4EncodingBits::GetBytesPerBlock(m_encodingbitsformat);
-		m_paucEncodingBits = new unsigned char[m_uiEncodingBitsBytes];
-
-		InitBlocksAndBlockSorter();
-		return m_encodingStatus;
-	}
-
-	unsigned int Image::CalculateJobs(unsigned int a_uiJobs, unsigned int const a_uiMaxJobs) {
-		if (a_uiJobs < 1)
-		{
-			a_uiJobs = 1;
-			AddToEncodingStatus(WARNING_JOBS_OUT_OF_RANGE);
-		}
-		else if (a_uiJobs > a_uiMaxJobs)
-		{
-			a_uiJobs = a_uiMaxJobs;
-			AddToEncodingStatus(WARNING_JOBS_OUT_OF_RANGE);
-		}
-
-		return a_uiJobs;
-	}
-
-	// ----------------------------------------------------------------------------------------------------
-	// encode an image
-	// create a set of encoding bits that conforms to a_format
-	// find best fit using a_errormetric
-	// explore a range of possible encodings based on a_fEffort (range = [0:100])
-	// speed up process using a_uiJobs as the number of process threads (a_uiJobs must not excede a_uiMaxJobs)
-	//
-	Image::EncodingStatus Image::Encode(Executor& a_executor, Format a_format, ErrorMetric a_errormetric, float a_fEffort, unsigned int a_uiJobs, unsigned int a_uiMaxJobs)
-	{
-		auto encodingStatus = InitEncode(a_executor, a_format, a_errormetric, a_fEffort);
-
-		if (IsError(encodingStatus))
-		{
-			return m_encodingStatus;
-		}
-
-		a_uiJobs = CalculateJobs(a_uiJobs, a_uiMaxJobs);
-
-		std::future<void> *handle = new std::future<void>[a_uiMaxJobs];
-
-		unsigned int uiNumThreadsNeeded = 0;
-		unsigned int uiUnfinishedBlocks = GetNumberOfBlocks();
-
-		uiNumThreadsNeeded = (uiUnfinishedBlocks < a_uiJobs) ? uiUnfinishedBlocks : a_uiJobs;
-			
-		for (int i = 0; i < (int)uiNumThreadsNeeded - 1; i++)
-		{
-			handle[i] = async(std::launch::async, &Image::RunFirstPass, this, a_executor.m_fEffort, i, uiNumThreadsNeeded);
-		}
-
-		RunFirstPass(a_executor.m_fEffort, uiNumThreadsNeeded - 1, uiNumThreadsNeeded);
-
-		for (int i = 0; i < (int)uiNumThreadsNeeded - 1; i++)
-		{
-			handle[i].get();
-		}
-
-		// perform effort-based encoding
-		if (a_executor.m_fEffort > ETCCOMP_MIN_EFFORT_LEVEL)
-		{
-			unsigned int uiFinishedBlocks = 0;
-			unsigned int uiTotalEffortBlocks = static_cast<unsigned int>(roundf(0.01f * a_executor.m_fEffort  * GetNumberOfBlocks()));
-
-			if (a_executor.m_bVerboseOutput)
-			{
-				printf("effortblocks = %d\n", uiTotalEffortBlocks);
-			}
-			unsigned int uiPass = 0;
-			while (1)
-			{
-				if (a_executor.m_bVerboseOutput)
-				{
-					uiPass++;
-					printf("pass %u\n", uiPass);
-				}
-				m_psortedblocklist->Sort();
-				uiUnfinishedBlocks = m_psortedblocklist->GetNumberOfSortedBlocks();
-				uiFinishedBlocks = GetNumberOfBlocks() - uiUnfinishedBlocks;
-				if (a_executor.m_bVerboseOutput)
-				{
-					printf("    %u unfinished blocks\n", uiUnfinishedBlocks);
-					// m_psortedblocklist->Print();
-				}
-
-				
-
-				//stop enocding when we did enough to satify the effort percentage
-				if (uiFinishedBlocks >= uiTotalEffortBlocks)
-				{
-					if (a_executor.m_bVerboseOutput)
-					{
-						printf("Finished %d Blocks out of %d\n", uiFinishedBlocks, uiTotalEffortBlocks);
-					}
-					break;
-				}
-
-				unsigned int uiIteratedBlocks = 0;
-				unsigned int blocksToIterateThisPass = (uiTotalEffortBlocks - uiFinishedBlocks);
-				uiNumThreadsNeeded = (uiUnfinishedBlocks < a_uiJobs) ? uiUnfinishedBlocks : a_uiJobs;
-
-				if (uiNumThreadsNeeded <= 1)
-				{
-					//since we already how many blocks each thread will process
-					//cap the thread limit to do the proper amount of work, and not more
-					uiIteratedBlocks = IterateThroughWorstBlocks(a_executor.m_fEffort, blocksToIterateThisPass, 0, 1);
-				}
-				else
-				{
-					//we have a lot of work to do, so lets multi thread it
-					std::future<unsigned int> *handleToBlockEncoders = new std::future<unsigned int>[uiNumThreadsNeeded-1];
-
-					for (int i = 0; i < (int)uiNumThreadsNeeded - 1; i++)
-					{
-						handleToBlockEncoders[i] = async(std::launch::async, &Image::IterateThroughWorstBlocks, this, a_executor.m_fEffort, blocksToIterateThisPass, i, uiNumThreadsNeeded);
-					}
-					uiIteratedBlocks = IterateThroughWorstBlocks(a_executor.m_fEffort, blocksToIterateThisPass, uiNumThreadsNeeded - 1, uiNumThreadsNeeded);
-
-					for (int i = 0; i < (int)uiNumThreadsNeeded - 1; i++)
-					{
-						uiIteratedBlocks += handleToBlockEncoders[i].get();
-					}
-
-					delete[] handleToBlockEncoders;
-				}
-
-				if (a_executor.m_bVerboseOutput)
-				{
-					printf("    %u iterated blocks\n", uiIteratedBlocks);
-				}
-			}
-		}
-
-		// generate Etc2-compatible bit-format 4x4 blocks
-		for (int i = 0; i < (int)a_uiJobs - 1; i++)
-		{
-			handle[i] = async(std::launch::async, &Image::SetEncodingBits, this, i, a_uiJobs);
-		}
-		SetEncodingBits(a_uiJobs - 1, a_uiJobs);
-
-		for (int i = 0; i < (int)a_uiJobs - 1; i++)
-		{
-			handle[i].get();
-		}
-
-		delete[] handle;
-		delete m_psortedblocklist;
-		return m_encodingStatus;
-	}
-
-	// ----------------------------------------------------------------------------------------------------
-	// iterate the encoding thru the blocks with the worst error
-	// stop when a_uiMaxBlocks blocks have been iterated
-	// split the blocks between the process threads using a_uiMultithreadingOffset and a_uiMultithreadingStride
-	//
-	unsigned int Image::IterateThroughWorstBlocks(float const a_fEffort,
-													unsigned int a_uiMaxBlocks,
-													unsigned int a_uiMultithreadingOffset, 
-													unsigned int a_uiMultithreadingStride)
-	{
-		assert(a_uiMultithreadingStride > 0);
-		unsigned int uiIteratedBlocks = a_uiMultithreadingOffset;
-
-		SortedBlockList::Link *plink = m_psortedblocklist->GetLinkToFirstBlock();
-		for (plink = plink->Advance(a_uiMultithreadingOffset);
-				plink != nullptr;
-				plink = plink->Advance(a_uiMultithreadingStride) )
-		{
-			if (uiIteratedBlocks >= a_uiMaxBlocks)
-			{
-				break;
-			}
-
-			plink->GetBlock()->PerformEncodingIteration(m_format, m_errormetric, a_fEffort);
-
-			uiIteratedBlocks += a_uiMultithreadingStride;	
-		}
-
-		return uiIteratedBlocks;
-	}
-
-	// ----------------------------------------------------------------------------------------------------
-	// determine which warnings to check for during Encode() based on encoding format
-	//
-	void Image::FindEncodingWarningTypesForCurFormat()
-	{
-		m_warningsToCapture = GetEncodingWarningTypes(m_format);
-	}
-
-	// ----------------------------------------------------------------------------------------------------
-	// examine source pixels to check for warnings
-	//
-	void Image::FindAndSetEncodingWarnings()
-	{
-		auto const warning = FindEncodingWarning();
-		if (warning == EncodingStatus::SUCCESS)
-		{
-			return;
-		}
-
-		AddToEncodingStatusIfSignfigant(warning);
-	}
-
-	Image::EncodingStatus Image::FindEncodingWarning() const {
-		int numPixels = (m_uiBlockRows * 4) * (m_uiBlockColumns * 4);
-		EncodingStatus warnings = EncodingStatus::SUCCESS;
-		if (m_iNumOpaquePixels == numPixels)
-		{
-			warnings |= EncodingStatus::WARNING_ALL_OPAQUE_PIXELS;
-		}
-		if (m_iNumOpaquePixels < numPixels)
-		{
-			warnings |= EncodingStatus::WARNING_SOME_NON_OPAQUE_PIXELS;
-		}
-		if (m_iNumTranslucentPixels > 0)
-		{
-			warnings |= EncodingStatus::WARNING_SOME_TRANSLUCENT_PIXELS;
-		}
-		if (m_iNumTransparentPixels == numPixels)
-		{
-			warnings |= EncodingStatus::WARNING_ALL_TRANSPARENT_PIXELS;
-		}
-		if (m_numColorValues.fB > 0.0f)
-		{
-			warnings |= EncodingStatus::WARNING_SOME_BLUE_VALUES_ARE_NOT_ZERO;
-		}
-		if (m_numColorValues.fG > 0.0f) 
-		{
-			warnings |= EncodingStatus::WARNING_SOME_GREEN_VALUES_ARE_NOT_ZERO;
-		}
-
-		if (m_numOutOfRangeValues.fR > 0.0f || m_numOutOfRangeValues.fG > 0.0f)
-		{
-			warnings |= EncodingStatus::WARNING_SOME_RGBA_NOT_0_TO_1;
-		}
-		if (m_numOutOfRangeValues.fB > 0.0f || m_numOutOfRangeValues.fA > 0.0f)
-		{
-			warnings |= EncodingStatus::WARNING_SOME_RGBA_NOT_0_TO_1;
-		}
-		return warnings;
 	}
 	
 	// ----------------------------------------------------------------------------------------------------
@@ -514,88 +214,7 @@ namespace Etc
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// init image blocks prior to encoding
-	// init block sorter for subsequent sortings
-	// check for encoding warnings
-	//
-	void Image::InitBlocksAndBlockSorter(void)
-	{
-		
-		FindEncodingWarningTypesForCurFormat();
 
-		// init each block
-		Block4x4 *pblock = m_pablock;
-		unsigned char *paucEncodingBits = m_paucEncodingBits;
-		for (unsigned int uiBlockRow = 0; uiBlockRow < m_uiBlockRows; uiBlockRow++)
-		{
-			unsigned int uiBlockV = uiBlockRow * 4;
-
-			for (unsigned int uiBlockColumn = 0; uiBlockColumn < m_uiBlockColumns; uiBlockColumn++)
-			{
-				unsigned int uiBlockH = uiBlockColumn * 4;
-
-				pblock->InitFromSource(this, uiBlockH, uiBlockV, paucEncodingBits, m_errormetric);
-
-				paucEncodingBits += Block4x4EncodingBits::GetBytesPerBlock(m_encodingbitsformat);
-
-				pblock++;
-			}
-		}
-
-		FindAndSetEncodingWarnings();
-
-		// init block sorter
-		{
-			m_psortedblocklist = new SortedBlockList(GetNumberOfBlocks(), 100);
-
-			for (unsigned int uiBlock = 0; uiBlock < GetNumberOfBlocks(); uiBlock++)
-			{
-				pblock = &m_pablock[uiBlock];
-				m_psortedblocklist->AddBlock(pblock);
-			}
-		}
-
-	}
-
-	// ----------------------------------------------------------------------------------------------------
-	// run the first pass of the encoder
-	// the encoder generally finds a reasonable, fast encoding
-	// this is run on all blocks regardless of effort to ensure that all blocks have a valid encoding
-	//
-	void Image::RunFirstPass(float const a_fEffort,
-								unsigned int a_uiMultithreadingOffset,
-								unsigned int a_uiMultithreadingStride)
-	{
-		assert(a_uiMultithreadingStride > 0);
-
-		for (unsigned int uiBlock = a_uiMultithreadingOffset;
-				uiBlock < GetNumberOfBlocks(); 
-				uiBlock += a_uiMultithreadingStride)
-		{
-			Block4x4 *pblock = &m_pablock[uiBlock];
-			pblock->PerformEncodingIteration(m_format, m_errormetric, a_fEffort);
-		}
-	}
-
-    // ----------------------------------------------------------------------------------------------------
-	// set the encoding bits (for the output file) based on the best encoding for each block
-	//
-	void Image::SetEncodingBits(unsigned int a_uiMultithreadingOffset,
-								unsigned int a_uiMultithreadingStride)
-	{
-		assert(a_uiMultithreadingStride > 0);
-
-		for (unsigned int uiBlock = a_uiMultithreadingOffset; 
-				uiBlock < GetNumberOfBlocks(); 
-				uiBlock += a_uiMultithreadingStride)
-		{
-			Block4x4 *pblock = &m_pablock[uiBlock];
-			pblock->SetEncodingBitsFromEncoding(m_format);
-		}
-
-	}
-
-	// ----------------------------------------------------------------------------------------------------
 	// return the image error
 	// image error is the sum of all block errors
 	//

@@ -68,12 +68,20 @@ namespace Etc
 		
 		etcfile.UseSingleBlock(a_iPixelX, a_iPixelY);
 
+		auto const encodingBitsFormat = DetermineEncodingBitsFormat(etcfile.GetImageFormat());
+		if (encodingBitsFormat == Block4x4EncodingBits::Format::UNKNOWN)
+		{
+			printf("Error: Unknown encoding format\n");
+			exit(1);
+		}
+
 		// construct image with encoding bits
 		m_pimage = new Image(etcfile.GetImageFormat(),
 								etcfile.GetSourceWidth(),
 								etcfile.GetSourceHeight(),
 								etcfile.GetEncodingBits(),
 								etcfile.GetEncodingBitsBytes(),
+								encodingBitsFormat,
 								a_panalysisParent->GetImage(),
 								a_panalysisParent->GetImage()->GetErrorMetric());
 

@@ -260,7 +260,7 @@ int main(int argc, const char * argv[])
 							commands.e_ErrMetric);
 		Etc::Executor executor(image);
 		executor.m_bVerboseOutput = commands.verboseOutput;
-		Etc::Image::EncodingStatus encStatus = Etc::Image::EncodingStatus::SUCCESS;
+		auto encStatus = Etc::Executor::EncodingStatus::SUCCESS;
 		
 		encStatus = executor.Encode(commands.format, commands.e_ErrMetric, commands.fEffort, commands.uiJobs,MAX_JOBS);
 		if (commands.verboseOutput)
@@ -271,7 +271,7 @@ int main(int argc, const char * argv[])
 		}
 		Etc::File etcfile(commands.pstrOutputFilename, Etc::File::Format::INFER_FROM_FILE_EXTENSION,
 							commands.format,
-							image.GetEncodingBits(), image.GetEncodingBitsBytes(),
+							executor.GetEncodingBits(), executor.GetEncodingBitsBytes(),
 							image.GetSourceWidth(), image.GetSourceHeight(),
 							image.GetExtendedWidth(), image.GetExtendedHeight());
 
