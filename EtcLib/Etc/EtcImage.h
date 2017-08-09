@@ -255,4 +255,18 @@ public:
 		return ((status & Image::ERROR_THRESHOLD) - 1) >= (Image::ERROR_THRESHOLD - 1);
 	}
 
+	constexpr Image::EncodingStatus operator|(Image::EncodingStatus const lhs, Image::EncodingStatus const rhs)
+	{
+		return static_cast<Image::EncodingStatus>(
+			std::underlying_type_t<Image::EncodingStatus>(lhs)
+			| std::underlying_type_t<Image::EncodingStatus>(rhs)
+		);
+	}
+
+	constexpr Image::EncodingStatus& operator|=(Image::EncodingStatus& lhs, Image::EncodingStatus const rhs)
+	{
+		lhs = lhs | rhs;
+		return lhs;
+	}
+
 } // namespace Etc
