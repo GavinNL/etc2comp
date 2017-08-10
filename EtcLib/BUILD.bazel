@@ -1,9 +1,9 @@
 
 load("//:cxx.bzl", "cxx_library")
 
-cxx_library(
-    name = "EtcLib",
-    hdrs = [
+filegroup(
+    name = "hdrs",
+    srcs = [
         "Etc/Etc.h",
         "Etc/EtcColor.h",
         "Etc/EtcColorFloatRGBA.h",
@@ -26,6 +26,10 @@ cxx_library(
         "EtcCodec/EtcBlock4x4Encoding_RGB8A1.h",
         "EtcCodec/EtcBlock4x4Encoding_RGBA8.h",
     ],
+)
+
+filegroup(
+    name = "srcs",
     srcs = [
         "Etc/EtcExecutor.cpp",
         "Etc/EtcFilter.cpp",
@@ -44,6 +48,16 @@ cxx_library(
         "EtcCodec/EtcBlock4x4Encoding_RGB8A1.cpp",
         "EtcCodec/EtcBlock4x4Encoding_RGBA8.cpp",
     ],
+)
+
+cxx_library(
+    name = "EtcThreadedLib",
+    hdrs = [
+        ":hdrs",
+    ],
+    srcs = [
+        ":srcs",
+    ],
     includes = [
         "Etc",
         "EtcCodec",
@@ -51,5 +65,11 @@ cxx_library(
     linkopts = [
         "-lpthread",
     ],
+    visibility = ["//visibility:public"],
+)
+
+alias(
+    name = "EtcLib",
+    actual = ":EtcThreadedLib",
     visibility = ["//visibility:public"],
 )
