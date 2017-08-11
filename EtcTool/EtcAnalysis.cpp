@@ -37,11 +37,10 @@ namespace Etc
 
 	// ----------------------------------------------------------------------------------------------------
 	//
-	Analysis::Analysis(Image *a_pimage, const char *a_pstrOutputFolder)
-		: m_executor(*a_pimage)
+	Analysis::Analysis(Executor& a_executor, const char *a_pstrOutputFolder, std::chrono::milliseconds const a_msEncodeTime)
 	{
 
-		m_pimage = a_pimage;
+		m_pimage = &a_executor.GetImage();
 		m_pstrOutputFolder = a_pstrOutputFolder;
 		m_uiComparisons = 0;
 
@@ -67,7 +66,7 @@ namespace Etc
 			FILE *apfile[2];
 			apfile[0] = pfileTxt;
 			
-			if (m_executor.m_bVerboseOutput)
+			if (a_executor.m_bVerboseOutput)
 			{
 				apfile[1] = stdout;
 				numOutputs++;
@@ -76,18 +75,18 @@ namespace Etc
 			for (int i = 0; i < numOutputs; i++)
 			{			
 				
-				if (a_pimage->GetFormat() == Image::Format::R11 || a_pimage->GetFormat() == Image::Format::SIGNED_R11)
+				if (m_pimage->GetFormat() == Image::Format::R11 || m_pimage->GetFormat() == Image::Format::SIGNED_R11)
 				{
 					fprintf(apfile[i], "PSNR(r) = %.4f\n", ConvertErrorToPSNR(fImageError, 1 * uiImagePixels));
 				}
-				else if (a_pimage->GetFormat() == Image::Format::RG11 || a_pimage->GetFormat() == Image::Format::SIGNED_RG11)
+				else if (m_pimage->GetFormat() == Image::Format::RG11 || m_pimage->GetFormat() == Image::Format::SIGNED_RG11)
 				{
 					fprintf(apfile[i], "PSNR(rg) = %.4f\n", ConvertErrorToPSNR(fImageError, 2 * uiImagePixels));
 				}
 				else
 				{
 					int iComponents=3;
-					if (a_pimage->GetErrorMetric() == ErrorMetric::REC709)
+					if (m_pimage->GetErrorMetric() == ErrorMetric::REC709)
 					{
 						iComponents = (int)Block4x4Encoding::LUMA_WEIGHT + 2;
 					}
@@ -95,7 +94,7 @@ namespace Etc
 					fprintf(apfile[i], "PSNR(rgba) = %.4f\n", ConvertErrorToPSNR(fImageError, (iComponents+1) * uiImagePixels));
 				}
 				
-				fprintf(apfile[i], "EncodeTime = %.3f seconds\n", static_cast<float>(m_executor.GetEncodingTime().count()) / 1000.0f);
+				fprintf(apfile[i], "EncodeTime = %.3f seconds\n", static_cast<float>(a_msEncodeTime.count()) / 1000.0f);
 			}
 
 
