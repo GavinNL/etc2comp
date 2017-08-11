@@ -32,7 +32,7 @@ namespace Etc
 
 		static const unsigned int MAX_COMPARISONS = 4;
 
-		Analysis(Image *a_pimage, const char *a_pstrOutputFolder);
+		Analysis(Executor& a_executor, const char *a_pstrOutputFolder, std::chrono::milliseconds a_msEncodeTime);
 
 		void Compare(const char *a_pstrFilename, int a_iPixelX = -1, int a_iPixelY = -1);
 
@@ -63,7 +63,6 @@ namespace Etc
 									ColorR8G8B8A8 *a_pargba8Output,
 									unsigned int a_uiOutputWidth);
 
-		Executor		m_executor;
 		Image			*m_pimage;
 		const char		*m_pstrOutputFolder;
 		unsigned int	m_uiComparisons;

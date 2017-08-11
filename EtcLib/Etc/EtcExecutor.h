@@ -11,7 +11,6 @@ namespace Etc {
 	{
 	public:
 		using Format = Image::Format;
-		using Milliseconds = std::chrono::milliseconds;
 
 		//the differnt warning and errors that can come up during encoding
 		enum EncodingStatus : std::uint32_t
@@ -59,14 +58,14 @@ namespace Etc {
 		}
 		static Block4x4EncodingBits::Format DetermineEncodingBitsFormat(Format a_format);
 
-		inline Milliseconds GetEncodingTime(void)
-		{
-			return m_msEncodeTime;
-		}
-
 		inline ErrorMetric GetErrorMetric(void)
 		{
 			return m_errormetric;
+		}
+
+		inline Image& GetImage() const
+		{
+			return m_image;
 		}
 	private:
 
@@ -108,11 +107,6 @@ namespace Etc {
 
 		unsigned int CalculateJobs(unsigned int a_uiJobs, unsigned int a_uiMaxJobs);
 
-		EncodingStatus EncodeSteps(Format a_format, ErrorMetric a_errormetric, float a_fEffort, 
-			unsigned int a_uiJobs, unsigned int a_uiMaxJobs);
-
-		// stats
-		Milliseconds m_msEncodeTime = Milliseconds::zero();
 		Image& m_image;
 		float m_fEffort = 0.0f;
 		Block4x4EncodingBits::Format m_encodingbitsformat = Block4x4EncodingBits::Format::UNKNOWN;
@@ -233,6 +227,42 @@ namespace Etc {
 		default:
 			return Block4x4EncodingBits::Format::UNKNOWN;
 		}
+	}
+
+	class TimeEncodeResult
+	{
+	public:
+		using Milliseconds = std::chrono::milliseconds;
+		Milliseconds m_msEncodeTime;
+		Executor::EncodingStatus m_status;
+	};
+
+	template <auto i>
+	auto& get(TimeEncodeResult& result) {
+		if constexpr (i == 0)
+		{
+			return result.m_msEncodeTime;
+		}
+
+		if constexpr (i == 1)
+		{
+			return result.m_status;
+		}
+
+		assert(false);
+	}
+
+	template <typename Executor, typename... Args>
+	TimeEncodeResult TimeEncode(Executor&& a_executor, Args&&... args)
+	{
+		auto const start = std::chrono::steady_clock::now();
+
+		auto status = a_executor.Encode(std::forward<Args>(args)...);
+
+		auto const end = std::chrono::steady_clock::now();
+		auto const elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+		return {elapsed, status};
 	}
 
 } // namespace Etc

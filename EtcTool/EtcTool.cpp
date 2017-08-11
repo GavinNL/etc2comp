@@ -260,12 +260,11 @@ int main(int argc, const char * argv[])
 							commands.e_ErrMetric);
 		Etc::Executor executor(image);
 		executor.m_bVerboseOutput = commands.verboseOutput;
-		auto encStatus = Etc::Executor::EncodingStatus::SUCCESS;
 		
-		encStatus = executor.Encode(commands.format, commands.e_ErrMetric, commands.fEffort, commands.uiJobs,MAX_JOBS);
+		auto [msEncodingTime, encStatus] = TimeEncode(executor, commands.format, commands.e_ErrMetric, commands.fEffort, commands.uiJobs,MAX_JOBS);
 		if (commands.verboseOutput)
 		{
-			printf("  encode time = %ldms\n", executor.GetEncodingTime().count());
+			printf("  encode time = %ldms\n", msEncodingTime.count());
 			printf("EncodedImage: %s\n", commands.pstrOutputFilename);
 			printf("status bitfield: %u\n", encStatus);
 		}
@@ -283,7 +282,7 @@ int main(int argc, const char * argv[])
 			{
 				printf("Analysis: %s\n", commands.pstrAnalysisDirectory);
 			}
-			Analysis analysis(&image, commands.pstrAnalysisDirectory);
+			Analysis analysis(executor, commands.pstrAnalysisDirectory, msEncodingTime);
 
 			for (unsigned int uiComparison = 0; uiComparison < commands.uiComparisons; uiComparison++)
 			{

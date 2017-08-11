@@ -46,13 +46,13 @@ namespace Etc
 					a_eErrMetric);
 		Executor executor(image);
 		executor.m_bVerboseOutput = a_bVerboseOutput;
-		executor.Encode(a_format, a_eErrMetric, a_fEffort, a_uiJobs, a_uiMaxJobs);
+		auto result = TimeEncode(executor, a_format, a_eErrMetric, a_fEffort, a_uiJobs, a_uiMaxJobs);
 
 		*a_ppaucEncodingBits = executor.GetEncodingBits();
 		*a_puiEncodingBitsBytes = executor.GetEncodingBitsBytes();
 		*a_puiExtendedWidth = image.GetExtendedWidth();
 		*a_puiExtendedHeight = image.GetExtendedHeight();
-		*a_piEncodingTime_ms = executor.GetEncodingTime().count();
+		*a_piEncodingTime_ms = result.m_msEncodeTime.count();
 	}
 
 	void EncodeMipmaps(float *a_pafSourceRGBA,
@@ -96,14 +96,14 @@ namespace Etc
 				Image image(pImageData, mipWidth, mipHeight,	a_eErrMetric);
 				Executor executor(image);
 				executor.m_bVerboseOutput = a_bVerboseOutput;
-				executor.Encode(a_format, a_eErrMetric, a_fEffort, a_uiJobs, a_uiMaxJobs);
+				auto const result = TimeEncode(executor, a_format, a_eErrMetric, a_fEffort, a_uiJobs, a_uiMaxJobs);
 
 				a_pMipmapImages[mip].paucEncodingBits = std::shared_ptr<unsigned char>(executor.GetEncodingBits(), [](unsigned char *p) { delete[] p; });
 				a_pMipmapImages[mip].uiEncodingBitsBytes = executor.GetEncodingBitsBytes();
 			a_pMipmapImages[mip].uiExtendedWidth = image.GetExtendedWidth();
 			a_pMipmapImages[mip].uiExtendedHeight = image.GetExtendedHeight();
 
-				totalEncodingTime += executor.GetEncodingTime().count();
+				totalEncodingTime += result.m_msEncodeTime.count();
 			}
 
 			if(pMipImage)
