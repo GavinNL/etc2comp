@@ -16,6 +16,7 @@ cmake_minimum_required(VERSION 3.8)
 project(EtcTest)
 
 set (CMAKE_CXX_STANDARD 17)
+set (CXX_STANDARD_REQUIRED ON)
 IF (APPLE)
 	set (CMAKE_CXX_FLAGS "-I/usr/include/i386-linux-gnu/c++/4.8 -I/usr/include/c++/4.8 -std=c++11 -g3 -Wall -O3")
 ELSE ()
