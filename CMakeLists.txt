@@ -15,8 +15,11 @@
 cmake_minimum_required(VERSION 3.8)
 project(EtcTest)
 
+find_package (Threads REQUIRED)
+
 set (CMAKE_CXX_STANDARD 17)
 set (CXX_STANDARD_REQUIRED ON)
+IF (OFF)
 IF (APPLE)
 	set (CMAKE_CXX_FLAGS "-I/usr/include/i386-linux-gnu/c++/4.8 -I/usr/include/c++/4.8 -std=c++11 -g3 -Wall -O3")
 ELSE ()
@@ -26,5 +29,6 @@ ELSE ()
 		set (CMAKE_CXX_FLAGS "-I/usr/include/i386-linux-gnu/c++/4.8 -I/usr/include/c++/4.8 -std=c++11 -pthread -g3 -Wall -O2")
 	ENDIF()
 ENDIF ()
+ENDIF (OFF)
 ADD_SUBDIRECTORY(EtcLib)
 ADD_SUBDIRECTORY(EtcTool)

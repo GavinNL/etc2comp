@@ -22,3 +22,4 @@ file(GLOB SOURCES
 	${PROJECT_SOURCE_DIR}/Etc/*.cpp
 	${PROJECT_SOURCE_DIR}/EtcCodec/*.cpp)
 ADD_LIBRARY(EtcLib ${SOURCES})
+target_link_libraries(EtcLib Threads::Threads)
