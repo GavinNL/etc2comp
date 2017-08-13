@@ -103,7 +103,7 @@ namespace Etc {
 												unsigned int a_uiMultithreadingOffset,
 												unsigned int a_uiMultithreadingStride);
 
-		EncodingStatus InitEncode(Image& a_image, Format a_format, ErrorMetric a_errormetric, float a_fEffort);
+		EncodingStatus InitEncode(Format a_format, ErrorMetric a_errormetric, float a_fEffort);
 
 		unsigned int CalculateJobs(unsigned int a_uiJobs, unsigned int a_uiMaxJobs);
 

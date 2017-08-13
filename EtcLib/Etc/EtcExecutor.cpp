@@ -12,11 +12,11 @@ namespace Etc {
 		: m_image(image)
 	{}
 
-	Executor::EncodingStatus Executor::InitEncode(Image& a_image, Format const a_format, ErrorMetric const a_errormetric, float const a_fEffort)
+	Executor::EncodingStatus Executor::InitEncode(Format const a_format, ErrorMetric const a_errormetric, float const a_fEffort)
 	{
 		m_encodingStatus = EncodingStatus::SUCCESS;
 
-		a_image.m_format = a_format;
+		m_image.m_format = a_format;
 		m_errormetric = a_errormetric;
 		m_fEffort = a_fEffort;
 
@@ -37,7 +37,7 @@ namespace Etc {
 			m_fEffort = ETCCOMP_MAX_EFFORT_LEVEL;
 		}
 
-		m_encodingbitsformat = DetermineEncodingBitsFormat(a_image.GetFormat());
+		m_encodingbitsformat = DetermineEncodingBitsFormat(m_image.GetFormat());
 
 		if (m_encodingbitsformat == Block4x4EncodingBits::Format::UNKNOWN)
 		{
@@ -46,7 +46,7 @@ namespace Etc {
 		}
 
 		assert(m_paucEncodingBits == nullptr);
-		m_uiEncodingBitsBytes = a_image.GetNumberOfBlocks() * Block4x4EncodingBits::GetBytesPerBlock(m_encodingbitsformat);
+		m_uiEncodingBitsBytes = m_image.GetNumberOfBlocks() * Block4x4EncodingBits::GetBytesPerBlock(m_encodingbitsformat);
 		m_paucEncodingBits = new unsigned char[m_uiEncodingBitsBytes];
 
 		InitBlocksAndBlockSorter();
@@ -78,7 +78,7 @@ namespace Etc {
 	//
 	Executor::EncodingStatus Executor::Encode(Format a_format, ErrorMetric a_errormetric, float a_fEffort, unsigned int a_uiJobs, unsigned int a_uiMaxJobs)
 	{
-		auto encodingStatus = InitEncode(m_image, a_format, a_errormetric, a_fEffort);
+		auto encodingStatus = InitEncode(a_format, a_errormetric, a_fEffort);
 
 		if (IsError(encodingStatus))
 		{
