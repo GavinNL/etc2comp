@@ -15,6 +15,7 @@
 project(EtcLib)
 include_directories(./Etc)
 include_directories(./EtcCodec)
+include_directories(./EtcThreaded)
 
 file(GLOB SOURCES
 	${PROJECT_SOURCE_DIR}/Etc/*.h
