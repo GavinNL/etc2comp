@@ -39,9 +39,6 @@ namespace Etc {
 
 		Executor(Image& image);
 
-		EncodingStatus Encode(Image::Format a_format, ErrorMetric a_errormetric, float a_fEffort,
-			unsigned int a_uiJobs, unsigned int a_uiMaxJobs);
-
 		inline void AddToEncodingStatus(EncodingStatus a_encStatus)
 		{
 			m_encodingStatus = (EncodingStatus)((unsigned int)m_encodingStatus | (unsigned int)a_encStatus);
@@ -67,6 +64,11 @@ namespace Etc {
 		{
 			return m_image;
 		}
+	protected:
+		EncodingStatus InitEncode(Format a_format, ErrorMetric a_errormetric, float a_fEffort);
+
+		void SetEncodingBits(unsigned int a_uiMultithreadingOffset,
+								unsigned int a_uiMultithreadingStride);
 	private:
 
 		//add a warning or error to check for while encoding
@@ -91,32 +93,20 @@ namespace Etc {
 
 		void InitBlocksAndBlockSorter(void);
 
-		void RunFirstPass(float a_fEffort,
-							unsigned int a_uiMultithreadingOffset,
-							unsigned int a_uiMultithreadingStride);
-
-		void SetEncodingBits(unsigned int a_uiMultithreadingOffset,
-								unsigned int a_uiMultithreadingStride);
-
-		unsigned int IterateThroughWorstBlocks(float a_fEffort,
-												unsigned int a_uiMaxBlocks,
-												unsigned int a_uiMultithreadingOffset,
-												unsigned int a_uiMultithreadingStride);
-
-		EncodingStatus InitEncode(Format a_format, ErrorMetric a_errormetric, float a_fEffort);
-
-		unsigned int CalculateJobs(unsigned int a_uiJobs, unsigned int a_uiMaxJobs);
-
 		Image& m_image;
+	protected:
 		float m_fEffort = 0.0f;
+	private:
 		Block4x4EncodingBits::Format m_encodingbitsformat = Block4x4EncodingBits::Format::UNKNOWN;
 		unsigned int m_uiEncodingBitsBytes = 0;		// for entire image
 		unsigned char *m_paucEncodingBits = nullptr;
 		ErrorMetric m_errormetric;
 		
+	protected:
 		SortedBlockList *m_psortedblocklist;
 		//this will hold any warning or errors that happen during encoding
 		EncodingStatus m_encodingStatus = EncodingStatus::SUCCESS;
+	private:
 		//these will be the warnings we are tracking
 		EncodingStatus m_warningsToCapture = EncodingStatus::SUCCESS;
 	public:

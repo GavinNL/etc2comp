@@ -13,6 +13,18 @@ cxx_test(
     size = "small",
 )
 
+cxx_test(
+    name = "EtcThreadedExecutorTest",
+    srcs = [
+        "EtcThreadedExecutorTest.cpp",
+    ],
+    deps = [
+        "@com_google_googletest//:googletest",
+        "//EtcLib",
+    ],
+    size = "small",
+)
+
 test_suite(
     name = "small_tests",
     tags = [

@@ -16,7 +16,7 @@
 
 #include "EtcConfig.h"
 #include "Etc.h"
-#include "EtcExecutor.h"
+#include "EtcThreadedExecutor.h"
 #include "EtcFilter.h"
 
 #include <cstring>
@@ -44,7 +44,7 @@ namespace Etc
 		Image image(a_pafSourceRGBA, a_uiSourceWidth,
 					a_uiSourceHeight,
 					a_eErrMetric);
-		Executor executor(image);
+		ThreadedExecutor executor(image);
 		executor.m_bVerboseOutput = a_bVerboseOutput;
 		auto result = TimeEncode(executor, a_format, a_eErrMetric, a_fEffort, a_uiJobs, a_uiMaxJobs);
 
@@ -94,7 +94,7 @@ namespace Etc
 			{
 			
 				Image image(pImageData, mipWidth, mipHeight,	a_eErrMetric);
-				Executor executor(image);
+				ThreadedExecutor executor(image);
 				executor.m_bVerboseOutput = a_bVerboseOutput;
 				auto const result = TimeEncode(executor, a_format, a_eErrMetric, a_fEffort, a_uiJobs, a_uiMaxJobs);
 

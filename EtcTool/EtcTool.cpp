@@ -41,6 +41,7 @@ that can be created.
 #include "EtcBlock4x4EncodingBits.h"
 
 #include "EtcAnalysis.h"
+#include "EtcThreadedExecutor.h"
 
 #include <cassert>
 #include <cstdlib>
@@ -258,7 +259,7 @@ int main(int argc, const char * argv[])
 		Etc::Image image((float *)sourceimage.GetPixels(),
 							uiSourceWidth, uiSourceHeight,
 							commands.e_ErrMetric);
-		Etc::Executor executor(image);
+		Etc::ThreadedExecutor executor(image);
 		executor.m_bVerboseOutput = commands.verboseOutput;
 		
 		auto [msEncodingTime, encStatus] = TimeEncode(executor, commands.format, commands.e_ErrMetric, commands.fEffort, commands.uiJobs,MAX_JOBS);
