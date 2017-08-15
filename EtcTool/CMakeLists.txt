@@ -15,6 +15,7 @@
 project(EtcTool)
 include_directories(../EtcLib/Etc)
 include_directories(../EtcLib/EtcCodec)
+include_directories(../EtcLib/EtcThreaded)
 include_directories(../third_party/lodepng)
 
 file(GLOB SOURCES
