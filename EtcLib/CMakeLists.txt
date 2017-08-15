@@ -20,7 +20,9 @@ include_directories(./EtcThreaded)
 file(GLOB SOURCES
 	${PROJECT_SOURCE_DIR}/Etc/*.h
 	${PROJECT_SOURCE_DIR}/EtcCodec/*.h
+	${PROJECT_SOURCE_DIR}/EtcThreaded/*.h
 	${PROJECT_SOURCE_DIR}/Etc/*.cpp
-	${PROJECT_SOURCE_DIR}/EtcCodec/*.cpp)
+	${PROJECT_SOURCE_DIR}/EtcCodec/*.cpp
+	${PROJECT_SOURCE_DIR}/EtcThreaded/*.cpp)
 ADD_LIBRARY(EtcLib ${SOURCES})
 target_link_libraries(EtcLib Threads::Threads)
