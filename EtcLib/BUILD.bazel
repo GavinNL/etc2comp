@@ -2,40 +2,70 @@
 load("//:cxx.bzl", "cxx_library")
 
 cxx_library(
-    name = "EtcLib",
+    name = "EtcLibBase",
     hdrs = [
         "Etc/Etc.h",
         "Etc/EtcColor.h",
         "Etc/EtcColorFloatRGBA.h",
         "Etc/EtcConfig.h",
-        "Etc/EtcExecutor.h",
-        "Etc/EtcFilter.h",
-        "Etc/EtcMath.h",
         "Etc/EtcImage.h",
-        "EtcCodec/EtcBlock4x4EncodingBits.h",
-        "EtcCodec/EtcDifferentialTrys.h",
-        "EtcCodec/EtcIndividualTrys.h",
-        "EtcCodec/EtcSortedBlockList.h",
-        "EtcCodec/EtcErrorMetric.h",
+        "Etc/EtcExecutor.h",
         "EtcCodec/EtcBlock4x4.h",
         "EtcCodec/EtcBlock4x4Encoding.h",
+        "EtcCodec/EtcBlock4x4EncodingBits.h",
+        "EtcCodec/EtcErrorMetric.h",
+        "EtcCodec/EtcSortedBlockList.h",
+    ],
+    srcs = [
+        "Etc/EtcExecutor.cpp",
+        "EtcCodec/EtcSortedBlockList.cpp",
+    ],
+    includes = [
+        "Etc",
+        "EtcCodec",
+    ],
+)
+
+cxx_library(
+    name = "EtcLibThreaded",
+    hdrs = [
+        "EtcThreaded/EtcThreadedExecutor.h",
+    ],
+    srcs = [
+        "EtcThreaded/EtcThreadedExecutor.cpp",
+    ],
+    includes = [
+        "EtcThreaded",
+    ],
+    deps = [
+        ":EtcLibBase",
+    ],
+    linkopts = [
+        "-lpthread",
+    ],
+)
+
+cxx_library(
+    name = "EtcLib",
+    hdrs = [
+        "Etc/EtcFilter.h",
+        "Etc/EtcMath.h",
+        "EtcCodec/EtcDifferentialTrys.h",
+        "EtcCodec/EtcIndividualTrys.h",
         "EtcCodec/EtcBlock4x4Encoding_ETC1.h",
         "EtcCodec/EtcBlock4x4Encoding_R11.h",
         "EtcCodec/EtcBlock4x4Encoding_RG11.h",
         "EtcCodec/EtcBlock4x4Encoding_RGB8.h",
         "EtcCodec/EtcBlock4x4Encoding_RGB8A1.h",
         "EtcCodec/EtcBlock4x4Encoding_RGBA8.h",
-        "EtcThreaded/EtcThreadedExecutor.h",
     ],
     srcs = [
-        "Etc/EtcExecutor.cpp",
         "Etc/EtcFilter.cpp",
         "Etc/EtcMath.cpp",
         "Etc/Etc.cpp",
         "Etc/EtcImage.cpp",
         "EtcCodec/EtcDifferentialTrys.cpp",
         "EtcCodec/EtcIndividualTrys.cpp",
-        "EtcCodec/EtcSortedBlockList.cpp",
         "EtcCodec/EtcBlock4x4Encoding.cpp",
         "EtcCodec/EtcBlock4x4.cpp",
         "EtcCodec/EtcBlock4x4Encoding_ETC1.cpp",
@@ -44,15 +74,9 @@ cxx_library(
         "EtcCodec/EtcBlock4x4Encoding_RGB8.cpp",
         "EtcCodec/EtcBlock4x4Encoding_RGB8A1.cpp",
         "EtcCodec/EtcBlock4x4Encoding_RGBA8.cpp",
-        "EtcThreaded/EtcThreadedExecutor.cpp",
     ],
-    includes = [
-        "Etc",
-        "EtcCodec",
-        "EtcThreaded",
-    ],
-    linkopts = [
-        "-lpthread",
+    deps = [
+        ":EtcLibThreaded",
     ],
     visibility = [
         "//EtcLibTest:__subpackages__",
