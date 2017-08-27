@@ -54,5 +54,8 @@ cxx_library(
     linkopts = [
         "-lpthread",
     ],
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//EtcLibTest:__subpackages__",
+        "//EtcTool:__subpackages__",
+    ],
 )
